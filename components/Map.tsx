@@ -12,6 +12,10 @@ interface Location {
   longitude: number;
   neighborhood: string | null;
   borough: string | null;
+  notes: string | null;
+  // Future columns (not in DB yet — will be null until schema is updated)
+  website: string | null;
+  instagram: string | null;
 }
 
 function createPinElement(): HTMLElement {
@@ -28,9 +32,18 @@ function createPinElement(): HTMLElement {
 function createPopupHTML(loc: Location): string {
   const displayName = loc.display_name || loc.name;
   const sub = [loc.neighborhood, loc.borough].filter(Boolean).join(" · ");
-  return `<div style="padding:12px 16px;min-width:180px;">
-    <div style="font-size:15px;font-weight:600;color:#3D1C02;line-height:1.3;">${displayName}</div>
-    ${sub ? `<div style="margin-top:4px;font-size:12px;color:#9C6B3C;">${sub}</div>` : ""}
+
+  const linksHTML = (loc.website || loc.instagram) ? `
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(139,69,19,0.1);display:flex;gap:12px;flex-wrap:wrap;">
+      ${loc.website ? `<a href="${loc.website}" target="_blank" rel="noopener" style="font-size:12px;color:#8B4513;text-decoration:none;font-weight:500;">🌐 Website</a>` : ""}
+      ${loc.instagram ? `<a href="https://instagram.com/${loc.instagram.replace(/^@/, "")}" target="_blank" rel="noopener" style="font-size:12px;color:#8B4513;text-decoration:none;font-weight:500;">📸 @${loc.instagram.replace(/^@/, "")}</a>` : ""}
+    </div>` : "";
+
+  return `<div style="padding:14px 16px;min-width:200px;max-width:260px;font-family:-apple-system,sans-serif;">
+    <div style="font-size:15px;font-weight:700;color:#3D1C02;line-height:1.3;">${displayName}</div>
+    ${sub ? `<div style="margin-top:3px;font-size:12px;color:#9C6B3C;">${sub}</div>` : ""}
+    ${loc.notes ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(139,69,19,0.1);font-size:12px;color:#7A4010;line-height:1.5;">${loc.notes}</div>` : ""}
+    ${linksHTML}
   </div>`;
 }
 
@@ -50,7 +63,7 @@ export default function Map() {
 
       const { data: locations, error } = await supabase
         .from("locations")
-        .select("id, name, display_name, latitude, longitude, neighborhood, borough")
+        .select("id, name, display_name, latitude, longitude, neighborhood, borough, notes, website, instagram")
         .eq("status", "active")
         .order("name");
 
