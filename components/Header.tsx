@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Header({ count }: { count: number }) {
   return (
     <header
@@ -20,12 +22,17 @@ export default function Header({ count }: { count: number }) {
           </div>
         </div>
       </div>
-      <div style={{ textAlign: "right", fontFamily: "var(--font-inter), -apple-system, sans-serif" }}>
-        <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--cr-brown)", letterSpacing: "-0.01em" }}>
-          {count} cinnamon rolls
-        </div>
-        <div style={{ fontSize: "11px", color: "#9C6B3C", marginTop: 1 }}>
-          Updated today
+      <div style={{ display: "flex", alignItems: "center", gap: 24, fontFamily: "var(--font-inter), -apple-system, sans-serif" }}>
+        <Link href="/suggest" style={{ fontSize: "13px", fontWeight: 500, color: "#9C6B3C", textDecoration: "none", borderBottom: "1px solid rgba(156,107,60,0.35)", paddingBottom: 1, whiteSpace: "nowrap" }}>
+          + suggest a spot
+        </Link>
+        <div style={{ textAlign: "right" }}>
+          <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--cr-brown)", letterSpacing: "-0.01em" }}>
+            {count} cinnamon rolls
+          </div>
+          <div style={{ fontSize: "11px", color: "#9C6B3C", marginTop: 1 }}>
+            Updated today
+          </div>
         </div>
       </div>
     </header>
