@@ -13,7 +13,7 @@ export default async function Home() {
       <Header count={count ?? 0} />
       <main
         className="fixed inset-x-0 bottom-0"
-        style={{ top: "52px" }}
+        style={{ top: "60px" }}
       >
         <MapWrapper />
       </main>
