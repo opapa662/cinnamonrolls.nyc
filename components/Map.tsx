@@ -106,6 +106,7 @@ export default function Map() {
             .addTo(map);
         });
 
+        map.resize();
         map.fitBounds(bounds, { padding: 80, maxZoom: 14, duration: 0 });
       });
     }
@@ -118,5 +119,10 @@ export default function Map() {
     };
   }, []);
 
-  return <div ref={containerRef} className="absolute inset-0" />;
+  return (
+    <div
+      ref={containerRef}
+      style={{ position: "fixed", top: 52, left: 0, right: 0, bottom: 0 }}
+    />
+  );
 }
