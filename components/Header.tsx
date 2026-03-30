@@ -17,7 +17,9 @@ export default function Header() {
           letterSpacing: "-0.01em",
         }}
       >
-        🍥 cinnamonroll.nyc
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/icon.png" alt="" style={{ width: 28, height: 28, objectFit: "contain", marginRight: 8 }} />
+        cinnamonroll.nyc
       </span>
     </header>
   );
