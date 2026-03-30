@@ -47,9 +47,11 @@ function createPopupHTML(loc: Location): string {
 export default function Map() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapboxMap | null>(null);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
-    if (mapRef.current || !containerRef.current) return;
+    if (initializedRef.current || !containerRef.current) return;
+    initializedRef.current = true;
 
     async function init() {
       const mapboxgl = (await import("mapbox-gl")).default;
