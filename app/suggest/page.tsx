@@ -76,17 +76,17 @@ export default function SuggestPage() {
                   required
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  placeholder="e.g. Breadivore"
+                  placeholder="e.g. Radio Bakery"
                   style={inputStyle}
                 />
               </div>
               <div>
-                <label style={labelStyle}>Website <span style={{ color: "#9C6B3C", fontWeight: 400 }}>(optional)</span></label>
+                <label style={labelStyle}>Website or social handle <span style={{ color: "var(--cr-brown)" }}>*</span></label>
                 <input
-                  type="url"
+                  required
                   value={website}
                   onChange={e => setWebsite(e.target.value)}
-                  placeholder="https://..."
+                  placeholder="https://... or @handle"
                   style={inputStyle}
                 />
               </div>
@@ -95,7 +95,7 @@ export default function SuggestPage() {
                 <input
                   value={address}
                   onChange={e => setAddress(e.target.value)}
-                  placeholder="e.g. 287 5th Ave, Park Slope, Brooklyn"
+                  placeholder="e.g. 226 Nassau Ave, Greenpoint, Brooklyn"
                   style={inputStyle}
                 />
               </div>
