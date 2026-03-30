@@ -12,10 +12,9 @@ interface Location {
   longitude: number;
   neighborhood: string | null;
   borough: string | null;
-  status: string;
 }
 
-// Custom cinnamon roll SVG pin icon
+// Custom cinnamon roll SVG pin icon (44×44px tap target)
 const ROLL_SVG = `<svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
   <ellipse cx="22" cy="41" rx="9" ry="3" fill="rgba(0,0,0,0.15)"/>
   <circle cx="22" cy="20" r="18" fill="#C97B3A"/>
@@ -28,36 +27,19 @@ const ROLL_SVG = `<svg width="44" height="44" viewBox="0 0 44 44" fill="none" xm
   <path d="M12 20 C14.5 17, 18 15.5, 22 15.5 C26 15.5, 29.5 17, 32 20" stroke="#FFF8F0" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.8"/>
 </svg>`;
 
-function createPinElement(closed: boolean): HTMLElement {
+function createPinElement(): HTMLElement {
   const el = document.createElement("div");
-  el.style.cssText = `
-    width: 44px;
-    height: 44px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    ${closed ? "opacity: 0.4; filter: grayscale(0.9);" : ""}
-  `;
+  el.style.cssText =
+    "width:44px;height:44px;cursor:pointer;display:flex;align-items:center;justify-content:center;";
   el.innerHTML = ROLL_SVG;
   return el;
 }
 
 function createPopupHTML(loc: Location): string {
   const displayName = loc.display_name || loc.name;
-  const isClosed = loc.status === "closed";
   const sub = [loc.neighborhood, loc.borough].filter(Boolean).join(" · ");
-
   return `<div style="padding:12px 16px;min-width:180px;">
     <div style="font-size:15px;font-weight:600;color:#3D1C02;line-height:1.3;">${displayName}</div>
-    ${
-      isClosed
-        ? `<div style="margin-top:6px;display:inline-block;padding:2px 8px;
-            background:#f5e0e0;border-radius:4px;font-size:11px;font-weight:600;
-            color:#9b2226;letter-spacing:0.04em;text-transform:uppercase;">
-            Permanently Closed</div>`
-        : ""
-    }
     ${sub ? `<div style="margin-top:4px;font-size:12px;color:#9C6B3C;">${sub}</div>` : ""}
   </div>`;
 }
@@ -76,9 +58,8 @@ export default function Map() {
 
       const { data: locations, error } = await supabase
         .from("locations")
-        .select(
-          "id, name, display_name, latitude, longitude, neighborhood, borough, status"
-        )
+        .select("id, name, display_name, latitude, longitude, neighborhood, borough")
+        .eq("status", "active")
         .order("name");
 
       if (error) {
@@ -110,7 +91,6 @@ export default function Map() {
         locations.forEach((loc: Location) => {
           bounds.extend([loc.longitude, loc.latitude]);
 
-          const el = createPinElement(loc.status === "closed");
           const popup = new mapboxgl.Popup({
             offset: 25,
             closeButton: false,
@@ -118,13 +98,12 @@ export default function Map() {
             className: "cr-popup",
           }).setHTML(createPopupHTML(loc));
 
-          new mapboxgl.Marker({ element: el })
+          new mapboxgl.Marker({ element: createPinElement() })
             .setLngLat([loc.longitude, loc.latitude])
             .setPopup(popup)
             .addTo(map);
         });
 
-        // Auto-fit to show all pins
         map.fitBounds(bounds, { padding: 80, maxZoom: 14, duration: 0 });
       });
     }

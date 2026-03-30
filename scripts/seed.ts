@@ -69,7 +69,7 @@ const locations = [
     display_name: null,
     latitude: 40.726147,
     longitude: -74.004976,
-    neighborhood: "Hudson Square",
+    neighborhood: "SoHo",
     borough: "Manhattan",
     source: "The Infatuation",
     notes: "Ghost kitchen / pre-order only; cinnamon roll drops via Instagram @losersnyc — no walk-in",
