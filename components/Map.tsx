@@ -63,7 +63,7 @@ export default function Map() {
 
       const { data: locations, error } = await supabase
         .from("locations")
-        .select("id, name, display_name, latitude, longitude, neighborhood, borough, notes, website, instagram")
+        .select("id, name, display_name, latitude, longitude, neighborhood, borough, notes")
         .eq("status", "active")
         .order("name");
 
@@ -93,18 +93,19 @@ export default function Map() {
 
         const bounds = new mapboxgl.LngLatBounds();
 
-        locations.forEach((loc: Location) => {
-          bounds.extend([loc.longitude, loc.latitude]);
+        locations.forEach((loc: Omit<Location, "website" | "instagram"> & { website?: string | null; instagram?: string | null }) => {
+          const fullLoc: Location = { ...loc, website: loc.website ?? null, instagram: loc.instagram ?? null };
+          bounds.extend([fullLoc.longitude, fullLoc.latitude]);
 
           const popup = new mapboxgl.Popup({
             offset: 25,
             closeButton: false,
             maxWidth: "280px",
             className: "cr-popup",
-          }).setHTML(createPopupHTML(loc));
+          }).setHTML(createPopupHTML(fullLoc));
 
           new mapboxgl.Marker({ element: createPinElement() })
-            .setLngLat([loc.longitude, loc.latitude])
+            .setLngLat([fullLoc.longitude, fullLoc.latitude])
             .setPopup(popup)
             .addTo(map);
         });
