@@ -1,0 +1,41 @@
+@import "tailwindcss";
+@import "mapbox-gl/dist/mapbox-gl.css";
+
+:root {
+  --cr-cream: #fff8f0;
+  --cr-brown: #8b4513;
+  --cr-brown-dark: #3d1c02;
+  --cr-brown-mid: #9c6b3c;
+  --cr-brown-light: #d4904a;
+}
+
+html,
+body {
+  height: 100%;
+  background: var(--cr-cream);
+  color: var(--cr-brown-dark);
+}
+
+/* Mapbox popup overrides */
+.cr-popup .mapboxgl-popup-content {
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(139, 69, 19, 0.18);
+  background: var(--cr-cream);
+  border: 1px solid rgba(139, 69, 19, 0.12);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+}
+
+.cr-popup.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+  border-top-color: var(--cr-cream);
+}
+.cr-popup.mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
+  border-bottom-color: var(--cr-cream);
+}
+.cr-popup.mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+  border-right-color: var(--cr-cream);
+}
+.cr-popup.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+  border-left-color: var(--cr-cream);
+}
