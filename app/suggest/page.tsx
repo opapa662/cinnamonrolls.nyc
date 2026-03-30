@@ -49,7 +49,7 @@ export default function SuggestPage() {
         {submitted ? (
           <div style={{ textAlign: "center" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon.png" alt="" style={{ width: 56, height: 56, objectFit: "contain", marginBottom: 20 }} />
+            <img src="/icon.png" alt="" style={{ width: 56, height: 56, objectFit: "contain", display: "block", margin: "0 auto 20px" }} />
             <h1 style={{ fontSize: "22px", fontWeight: 700, color: "var(--cr-brown-dark)", marginBottom: 10 }}>
               Thanks for the tip!
             </h1>
