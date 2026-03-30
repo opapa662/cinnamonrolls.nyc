@@ -17,10 +17,10 @@ interface Location {
 function createPinElement(): HTMLElement {
   const el = document.createElement("div");
   el.style.cssText =
-    "width:44px;height:44px;cursor:pointer;";
+    "width:44px;height:44px;cursor:pointer;display:flex;align-items:center;justify-content:center;";
   const img = document.createElement("img");
   img.src = "/icon.png";
-  img.style.cssText = "width:44px;height:44px;object-fit:contain;";
+  img.style.cssText = "width:32px;height:32px;object-fit:contain;";
   el.appendChild(img);
   return el;
 }

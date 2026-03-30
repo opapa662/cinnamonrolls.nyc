@@ -10,6 +10,8 @@ export default function Header() {
     >
       <span
         style={{
+          display: "flex",
+          alignItems: "center",
           fontFamily: "var(--font-inter), -apple-system, sans-serif",
           fontSize: "15px",
           fontWeight: 600,
@@ -18,7 +20,7 @@ export default function Header() {
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icon.png" alt="" style={{ width: 28, height: 28, objectFit: "contain", marginRight: 8 }} />
+        <img src="/icon.png" alt="" style={{ width: 24, height: 24, objectFit: "contain", marginRight: 8 }} />
         cinnamonroll.nyc
       </span>
     </header>
