@@ -28,8 +28,8 @@ function createPopupHTML(loc: Location): string {
   const linksHTML =
     loc.website || loc.instagram
       ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(139,69,19,0.1);display:flex;gap:12px;flex-wrap:wrap;">
-          ${loc.website ? `<a href="${loc.website}" target="_blank" rel="noopener" style="font-size:12px;color:#8B4513;text-decoration:none;font-weight:500;">🌐 Website</a>` : ""}
-          ${loc.instagram ? `<a href="https://instagram.com/${loc.instagram.replace(/^@/, "")}" target="_blank" rel="noopener" style="font-size:12px;color:#8B4513;text-decoration:none;font-weight:500;">📸 @${loc.instagram.replace(/^@/, "")}</a>` : ""}
+          ${loc.website ? `<a href="${loc.website}" target="_blank" rel="noopener" style="font-size:12px;color:#8B4513;text-decoration:none;font-weight:500;outline:none;">🌐 Website</a>` : ""}
+          ${loc.instagram ? `<a href="https://instagram.com/${loc.instagram.replace(/^@/, "")}" target="_blank" rel="noopener" style="font-size:12px;color:#8B4513;text-decoration:none;font-weight:500;outline:none;">📸 @${loc.instagram.replace(/^@/, "")}</a>` : ""}
         </div>`
       : "";
 
