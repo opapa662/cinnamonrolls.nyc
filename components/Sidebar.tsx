@@ -92,7 +92,35 @@ function getRecentlyAdded(locations: SidebarLocation[], count = 4) {
     .slice(0, count);
 }
 
-function Heart({ filled }: { filled: boolean }) {
+export function RecentlyAddedItem({ loc, onClick, selected }: { loc: SidebarLocation; onClick: () => void; selected: boolean }) {
+  const displayName = loc.display_name || loc.name;
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        padding: "5px 12px",
+        cursor: "pointer",
+        borderBottom: "1px solid rgba(139,69,19,0.06)",
+        background: selected ? "rgba(139,69,19,0.07)" : "transparent",
+        transition: "background 0.1s",
+        borderLeft: selected ? "2px solid var(--cr-brown)" : "2px solid transparent",
+        fontSize: 12,
+        fontWeight: 400,
+        color: "var(--cr-brown-dark)",
+        lineHeight: 1.3,
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+      }}
+      onMouseEnter={(e) => { if (!selected) e.currentTarget.style.background = "rgba(139,69,19,0.05)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = selected ? "rgba(139,69,19,0.08)" : "transparent"; }}
+    >
+      {displayName}
+    </div>
+  );
+}
+
+export function Heart({ filled }: { filled: boolean }) {
   return filled ? (
     <svg width="20" height="20" viewBox="0 0 16 16" fill="#c0392b">
       <path d="M8 13.5S2 9.5 2 5.5C2 3.567 3.567 2 5.5 2c1 0 1.9.45 2.5 1.15C8.6 2.45 9.5 2 10.5 2 12.433 2 14 3.567 14 5.5c0 4-6 8-6 8Z"/>
@@ -104,7 +132,7 @@ function Heart({ filled }: { filled: boolean }) {
   );
 }
 
-function LocationItem({
+export function LocationItem({
   loc,
   onClick,
   saved,
@@ -266,13 +294,13 @@ export default function Sidebar({
             <div
               style={{
                 borderRadius: 8,
-                border: "1px solid rgba(139,69,19,0.15)",
+                border: "1px solid rgba(139,69,19,0.1)",
                 overflow: "hidden",
-                background: "#fff",
+                background: "rgba(253,247,242,0.7)",
               }}
             >
               {recentlyAdded.map((loc) => (
-                <LocationItem key={loc.id} loc={loc} onClick={() => onSelectLocation(loc)} saved={savedIds.has(loc.id)} onToggleSave={onToggleSave} selected={selectedId === loc.id} />
+                <RecentlyAddedItem key={loc.id} loc={loc} onClick={() => onSelectLocation(loc)} selected={selectedId === loc.id} />
               ))}
 
             </div>
@@ -291,18 +319,32 @@ export default function Sidebar({
           }}
         >
           <span style={sectionLabel}>
-            {nearbyMode ? "Nearby" : savedMode ? "Saved" : "All Locations"}
+            {nearbyMode
+              ? (nearbyRadius != null ? `Nearby (within ${nearbyRadius} mi)` : "Nearby")
+              : savedMode
+              ? (savedIds.size > 0 ? `Saved (${savedIds.size})` : "Saved")
+              : "All Locations"}
           </span>
-          {nearbyMode && filteredLocations.length > 0 && (
-            <span style={{ fontSize: 11, color: "#b08060", fontWeight: 500 }}>
-              {nearbyRadius != null ? `within ${nearbyRadius} mi` : `${filteredLocations.length} closest`}
-            </span>
-          )}
-          {!nearbyMode && (!savedMode || filteredLocations.length > 0) && (
-            <span style={{ fontSize: 11, color: "#b08060", fontWeight: 500 }}>
-              {savedMode ? filteredLocations.length : `${filteredLocations.length} of ${locations.length}`}
-            </span>
-          )}
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {(nearbyMode || savedMode) && (
+              <button
+                onClick={nearbyMode ? onNearbyClick : onToggleSavedMode}
+                style={{ fontSize: 11, color: "#9C6B3C", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "inherit" }}
+              >
+                Close ×
+              </button>
+            )}
+            {nearbyMode && filteredLocations.length > 0 && (
+              <span style={{ fontSize: 11, color: "#b08060", fontWeight: 500 }}>
+                {nearbyRadius != null ? `within ${nearbyRadius} mi` : `${filteredLocations.length} closest`}
+              </span>
+            )}
+            {!nearbyMode && (!savedMode || filteredLocations.length > 0) && (
+              <span style={{ fontSize: 11, color: "#b08060", fontWeight: 500 }}>
+                {savedMode ? filteredLocations.length : `${filteredLocations.length} of ${locations.length}`}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Full list */}
@@ -330,7 +372,7 @@ export default function Sidebar({
   );
 }
 
-const sectionLabel: React.CSSProperties = {
+export const sectionLabel: React.CSSProperties = {
   fontSize: 10,
   fontWeight: 700,
   color: "#9C6B3C",
