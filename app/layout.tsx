@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "cinnamonroll.nyc — Every great cinnamon roll in NYC",
+  title: "cinnamonrolls.nyc — Every great cinnamon roll in NYC",
   description:
     "An interactive map of NYC's best cinnamon roll spots. Find the perfect roll near you.",
   icons: { icon: "/icon.png", apple: "/icon.png" },

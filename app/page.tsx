@@ -1,12 +1,16 @@
 import Header from "@/components/Header";
-import MapWrapper from "@/components/MapWrapper";
+import MapPageClient from "@/components/MapPageClient";
 import { supabase } from "@/lib/supabase";
+import type { Location as MapLocation } from "@/components/Map";
+
+export const revalidate = 0;
 
 export default async function Home() {
-  const { count } = await supabase
+  const { data: locations, count } = await supabase
     .from("locations")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "active");
+    .select("id, name, display_name, latitude, longitude, neighborhood, borough, notes, website, instagram, location_type, days_open, created_at", { count: "exact" })
+    .eq("status", "active")
+    .order("name");
 
   return (
     <>
@@ -15,7 +19,7 @@ export default async function Home() {
         className="fixed inset-x-0 bottom-0"
         style={{ top: "60px" }}
       >
-        <MapWrapper />
+        <MapPageClient locations={(locations ?? []) as MapLocation[]} />
       </main>
     </>
   );

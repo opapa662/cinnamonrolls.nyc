@@ -2,18 +2,10 @@
 
 import { useEffect, useRef } from "react";
 import type { Map as MapboxMap } from "mapbox-gl";
-import { supabase } from "@/lib/supabase";
+import type { SidebarLocation } from "@/components/Sidebar";
 
-interface Location {
-  id: string;
-  name: string;
-  display_name: string | null;
-  latitude: number;
-  longitude: number;
-  neighborhood: string | null;
-  borough: string | null;
+export interface Location extends SidebarLocation {
   notes: string | null;
-  // Future columns (not in DB yet — will be null until schema is updated)
   website: string | null;
   instagram: string | null;
 }
@@ -21,7 +13,7 @@ interface Location {
 function createPinElement(): HTMLElement {
   const el = document.createElement("div");
   el.style.cssText =
-    "width:44px;height:44px;cursor:pointer;display:flex;align-items:center;justify-content:center;";
+    "width:42px;height:42px;cursor:pointer;display:flex;align-items:center;justify-content:center;";
   const img = document.createElement("img");
   img.src = "/icon.png";
   img.style.cssText = "width:32px;height:32px;object-fit:contain;";
@@ -30,14 +22,16 @@ function createPinElement(): HTMLElement {
 }
 
 function createPopupHTML(loc: Location): string {
-  const displayName = loc.display_name || loc.name;
+  const displayName = loc.name;
   const sub = [loc.neighborhood, loc.borough].filter(Boolean).join(" · ");
 
-  const linksHTML = (loc.website || loc.instagram) ? `
-    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(139,69,19,0.1);display:flex;gap:12px;flex-wrap:wrap;">
-      ${loc.website ? `<a href="${loc.website}" target="_blank" rel="noopener" style="font-size:12px;color:#8B4513;text-decoration:none;font-weight:500;">🌐 Website</a>` : ""}
-      ${loc.instagram ? `<a href="https://instagram.com/${loc.instagram.replace(/^@/, "")}" target="_blank" rel="noopener" style="font-size:12px;color:#8B4513;text-decoration:none;font-weight:500;">📸 @${loc.instagram.replace(/^@/, "")}</a>` : ""}
-    </div>` : "";
+  const linksHTML =
+    loc.website || loc.instagram
+      ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(139,69,19,0.1);display:flex;gap:12px;flex-wrap:wrap;">
+          ${loc.website ? `<a href="${loc.website}" target="_blank" rel="noopener" style="font-size:12px;color:#8B4513;text-decoration:none;font-weight:500;">🌐 Website</a>` : ""}
+          ${loc.instagram ? `<a href="https://instagram.com/${loc.instagram.replace(/^@/, "")}" target="_blank" rel="noopener" style="font-size:12px;color:#8B4513;text-decoration:none;font-weight:500;">📸 @${loc.instagram.replace(/^@/, "")}</a>` : ""}
+        </div>`
+      : "";
 
   return `<div style="padding:14px 16px;min-width:200px;max-width:260px;font-family:-apple-system,sans-serif;">
     <div style="font-size:15px;font-weight:700;color:#3D1C02;line-height:1.3;">${displayName}</div>
@@ -47,10 +41,23 @@ function createPopupHTML(loc: Location): string {
   </div>`;
 }
 
-export default function Map() {
+interface MapProps {
+  locations: Location[];
+  onMapReady?: (
+    map: MapboxMap,
+    fitAll: () => void,
+    showPopup: (id: string) => void,
+    setUserMarker: (lat: number, lng: number) => void,
+    clearUserMarker: () => void,
+  ) => void;
+}
+
+export default function Map({ locations, onMapReady }: MapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapboxMap | null>(null);
   const initializedRef = useRef(false);
+  const markersRef = useRef<globalThis.Map<string, import("mapbox-gl").Marker>>(new globalThis.Map());
+  const userMarkerRef = useRef<import("mapbox-gl").Marker | null>(null);
 
   useEffect(() => {
     if (initializedRef.current || !containerRef.current) return;
@@ -58,18 +65,7 @@ export default function Map() {
 
     async function init() {
       const mapboxgl = (await import("mapbox-gl")).default;
-
       mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
-
-      const { data: locations, error } = await supabase
-        .from("locations")
-        .select("id, name, display_name, latitude, longitude, neighborhood, borough, notes")
-        .eq("status", "active")
-        .order("name");
-
-      if (error) {
-        console.error("Failed to fetch locations:", error.message);
-      }
 
       if (!containerRef.current) return;
 
@@ -81,11 +77,7 @@ export default function Map() {
         attributionControl: false,
       });
 
-      map.addControl(
-        new mapboxgl.AttributionControl({ compact: true }),
-        "bottom-right"
-      );
-
+      map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-right");
       mapRef.current = map;
 
       map.on("load", () => {
@@ -93,25 +85,60 @@ export default function Map() {
 
         const bounds = new mapboxgl.LngLatBounds();
 
-        locations.forEach((loc: Omit<Location, "website" | "instagram"> & { website?: string | null; instagram?: string | null }) => {
-          const fullLoc: Location = { ...loc, website: loc.website ?? null, instagram: loc.instagram ?? null };
-          bounds.extend([fullLoc.longitude, fullLoc.latitude]);
+        locations.forEach((loc) => {
+          bounds.extend([loc.longitude, loc.latitude]);
 
           const popup = new mapboxgl.Popup({
             offset: 25,
             closeButton: false,
             maxWidth: "280px",
             className: "cr-popup",
-          }).setHTML(createPopupHTML(fullLoc));
+          }).setHTML(createPopupHTML(loc));
 
-          new mapboxgl.Marker({ element: createPinElement() })
-            .setLngLat([fullLoc.longitude, fullLoc.latitude])
+          const marker = new mapboxgl.Marker({ element: createPinElement() })
+            .setLngLat([loc.longitude, loc.latitude])
             .setPopup(popup)
             .addTo(map);
+
+          markersRef.current.set(loc.id, marker);
         });
+
+        const fitAll = () => {
+          map.resize();
+          map.fitBounds(bounds, { padding: 80, maxZoom: 14, duration: 600 });
+        };
 
         map.resize();
         map.fitBounds(bounds, { padding: 80, maxZoom: 14, duration: 0 });
+
+        const showPopup = (id: string) => {
+          // Close any currently open popup first
+          markersRef.current.forEach((m) => {
+            if (m.getPopup()?.isOpen()) m.togglePopup();
+          });
+          const marker = markersRef.current.get(id);
+          if (marker) marker.togglePopup();
+        };
+
+        const setUserMarker = (lat: number, lng: number) => {
+          userMarkerRef.current?.remove();
+          const el = document.createElement("div");
+          el.style.cssText = [
+            "width:18px;height:18px;border-radius:50%",
+            "background:#4a8fe2;border:3px solid #fff",
+            "box-shadow:0 0 0 3px rgba(74,143,226,0.35),0 2px 6px rgba(0,0,0,0.2)",
+          ].join(";");
+          userMarkerRef.current = new mapboxgl.Marker({ element: el })
+            .setLngLat([lng, lat])
+            .addTo(map);
+        };
+
+        const clearUserMarker = () => {
+          userMarkerRef.current?.remove();
+          userMarkerRef.current = null;
+        };
+
+        onMapReady?.(map, fitAll, showPopup, setUserMarker, clearUserMarker);
       });
     }
 
@@ -121,12 +148,7 @@ export default function Map() {
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return (
-    <div
-      ref={containerRef}
-      style={{ position: "fixed", top: 60, left: 0, right: 0, bottom: 0 }}
-    />
-  );
+  return <div ref={containerRef} style={{ position: "absolute", inset: 0 }} />;
 }
