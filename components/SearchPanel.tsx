@@ -24,12 +24,12 @@ export function hasActiveFilters(f: Filters): boolean {
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  bakery: "Bakery",
-  cafe: "Café",
-  restaurant: "Restaurant",
-  market: "Market",
-  pop_up: "Pop-up",
-  kiosk: "Kiosk",
+  Bakery: "Bakery",
+  Café: "Café",
+  Restaurant: "Restaurant",
+  Market: "Market",
+  "Pop-up": "Pop-up",
+  Kiosk: "Kiosk",
 };
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];

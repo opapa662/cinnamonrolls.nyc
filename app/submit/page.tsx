@@ -11,7 +11,7 @@ export default async function SubmitPage() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--cr-cream)", fontFamily: "var(--font-inter), -apple-system, sans-serif" }}>
       <Header count={count ?? 0} backLink />
-      <div style={{ paddingTop: "60px" }}>
+      <div style={{ paddingTop: "60px", paddingBottom: "36px" }}>
         <SubmitForm />
       </div>
     </div>

@@ -4,6 +4,14 @@
 
 ---
 
+## Brand
+
+- **Site name:** cinnamonrolls.nyc
+- **Tagline:** the ultimate map of the city's best swirls
+- **Page title:** cinnamonrolls.nyc - the ultimate map of the city's best swirls
+
+---
+
 ## Problem
 
 There's no single, visual resource for finding cinnamon rolls across New York City. Lists exist (The Infatuation, The Carboholic, etc.) but they're text-based articles — you can't see where spots are relative to you or to each other. If you're in a neighborhood and craving a cinnamon roll, you're Googling, scrolling articles, and cross-referencing addresses. It should be one glance at a map.
@@ -22,23 +30,16 @@ NYC residents and visitors who love cinnamon rolls and want to find the best one
 2. As a user on my phone, I want to tap a pin and see the bakery name in a styled card so I know what's there.
 3. As a first-time visitor, I want the map to load showing all spots immediately so I can start exploring without any setup.
 
-## Non-Goals
+## Non-Goals (current)
 
-<!-- What this does NOT do in v1. Prevents scope creep. -->
-
-- No filtering or search (no borough/neighborhood dropdowns)
-- No Google Places API integration (no hours, ratings, or photos from Google)
 - No community reviews or user-submitted ratings
 - No user accounts or login
-- No individual spot pages (`/spots/bakery-name`)
-- No neighborhood or borough pages
-- No "suggest a spot" submission form
+- No individual spot pages (`/spots/bakery-name`) — P1 next
+- No neighborhood or borough pages — P1 next
 - No editorial content or blog
-- No geolocation / "near me" feature
 - No social sharing
 - No visited/tracking functionality
 - No pricing data displayed
-- No tags or categories
 
 ## Success Metrics
 
@@ -89,13 +90,69 @@ Single-page Next.js app. On load, the app fetches all locations from Supabase vi
 | longitude | float | GPS longitude |
 | neighborhood | text | Neighborhood name (e.g., "Park Slope", "East Village") |
 | borough | text | NYC borough (e.g., "Brooklyn", "Manhattan") |
-| source | text | Where we learned about this spot (e.g., "The Infatuation", "The Carboholic") |
-| notes | text | Internal notes (varieties, availability days, etc.) — not displayed in MVP |
-| status | text | "active" or "closed" — defaults to "active". Closed spots stay on map with a dimmed/greyed-out pin. |
+| source | text | Where we learned about this spot (e.g., "The Infatuation", "The Carboholic") — shown as "Featured by" tags on popup |
+| notes | text | Displayed on popup card (e.g., "Saturdays only", "Inside Prospect Park Picnic House") |
+| location_type | text | Sentence case: Bakery, Café, Kiosk, Market, Pop-up, Restaurant |
+| website | text | Full URL — shown as link on popup card |
+| instagram | text | Handle (with or without @) — shown as link on popup card |
+| days_open | text | Legacy free-text field (used for sidebar filter fallback) |
+| google_place_id | text | Google Places ID — used to link rating to Google Maps |
+| google_rating | float | Google rating (e.g. 4.6) — shown on popup with 1 decimal place |
+| google_hours | jsonb | `{ weekday_text: string[] }` — parsed to "Open daily" / "Mon – Fri" etc. on popup |
+| status | text | "active" or "closed" — defaults to "active" |
 | created_at | timestamp | Auto-generated |
 | updated_at | timestamp | Auto-generated |
 
 _Multi-location bakeries:_ Each physical location is a separate row. Use `display_name` to distinguish them (e.g., "Winner — Windsor Terrace" and "Winner — Prospect Heights"). Single-location bakeries can leave `display_name` null and the popup will use `name`.
+
+---
+
+## Data Management
+
+### Seeding new locations
+
+1. Add a row directly in the Supabase Table Editor, or via `scripts/seed.ts`
+2. Required fields: `name`, `latitude`, `longitude`, `status = 'active'`
+3. Verify coordinates on Google Maps before inserting — paste `lat,lng` into the search bar
+4. For multi-location spots, create one row per physical location with a unique `display_name`
+5. After inserting, run the enrichment script to pull Google Places data (see below)
+
+### Google Places enrichment
+
+**Script:** `scripts/enrich-google-places.ts`
+**Run:** `npx tsx --env-file=.env.local scripts/enrich-google-places.ts`
+
+**How it works:**
+- Uses **Google Places Nearby Search** (`rankby=distance`) — NOT text search
+- Searches near each location's exact `latitude`/`longitude` with the location name as keyword
+- Because it ranks by distance, it always returns the **closest matching branch** to the stored coordinates — critical for multi-location spots (e.g., Barachou West Village vs Upper West Side)
+- Then fetches Place Details (`rating`, `opening_hours`) for the matched place
+- Saves `google_place_id`, `google_rating`, `google_hours` incrementally (one row at a time — no data loss on failure)
+
+**After running, QA in Supabase SQL Editor:**
+```sql
+select name, google_rating, google_hours->'weekday_text' as hours
+from locations where status = 'active' order by name;
+```
+
+**Manual fixes:** If a location matches the wrong place (check the logged name in the script output), update directly in SQL Editor:
+```sql
+update locations set
+  google_place_id = '<correct_place_id>',
+  google_rating = <rating>,
+  google_hours = '<hours_json>'::jsonb
+where name = '<location name>';
+```
+To find the correct `place_id`, use the Google Places Text Search endpoint with a specific query (e.g., `"Breads Bakery Union Square NYC"`).
+
+### Migrations
+
+All schema changes live in `supabase/migrations/` as append-only SQL files. Run them manually in the Supabase SQL Editor (Database → SQL Editor → New query).
+
+| Migration | What it does |
+|---|---|
+| `001_create_locations.sql` | Creates `locations` table with RLS + public read policy |
+| `002_google_places.sql` | Adds `google_place_id`, `google_rating`, `google_hours` columns |
 
 ### AI / LLM Strategy
 
@@ -107,8 +164,9 @@ No AI in MVP. Purely deterministic.
 
 ### External Integrations
 
-- **Mapbox GL JS** — map rendering and interaction (requires API access token)
-- **Supabase** — database and data API (requires project URL + anon key)
+- **Mapbox GL JS** — map rendering and interaction (requires `NEXT_PUBLIC_MAPBOX_TOKEN`)
+- **Supabase** — database and data API (requires `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY`)
+- **Google Places API** — enrichment script only (server-side, requires `GOOGLE_PLACES_API_KEY`). Not called at runtime — data is stored in Supabase. Re-run `scripts/enrich-google-places.ts` to refresh.
 
 ---
 

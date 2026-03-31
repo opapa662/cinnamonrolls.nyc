@@ -205,7 +205,7 @@ export default function Sidebar({
   return (
     <aside
       style={{
-        width: 300,
+        width: 400,
         flexShrink: 0,
         background: "var(--cr-cream)",
         borderRight: "1px solid rgba(139,69,19,0.12)",
@@ -258,7 +258,7 @@ export default function Sidebar({
       </div>
 
       {/* Scrollable content */}
-      <div style={{ flex: 1, overflowY: "auto" }}>
+      <div style={{ flex: 1, overflowY: "auto", paddingBottom: 8 }}>
         {/* Recently Added — hidden when filtered */}
         {!isFiltered && recentlyAdded.length > 0 && (
           <div style={{ padding: "12px 12px 0" }}>

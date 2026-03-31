@@ -87,7 +87,7 @@ export default function SubmitForm() {
         Add or edit a spot
       </h1>
       <p style={{ fontSize: "14px", color: "#9C6B3C", marginBottom: 28, lineHeight: 1.6 }}>
-        Found a missing cinnamon roll? Spotted something out of date? We want to hear from you.
+        Are we missing your favorite cinnamon roll? Noticed something out of date? We want to hear from you.
       </p>
 
       {/* Toggle */}
@@ -144,50 +144,50 @@ export default function SubmitForm() {
           </div>
         )}
 
-        {/* Name */}
-        <div>
-          <label style={labelStyle}>
-            Bakery name
-            {!isEdit && <span style={{ color: "var(--cr-brown)" }}> *</span>}
-            {isEdit && <span style={{ color: "#9C6B3C", fontWeight: 400 }}> (optional)</span>}
-          </label>
-          <input
-            required={!isEdit}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Radio Bakery"
-            style={inputStyle}
-          />
-        </div>
+        {/* Name — addition only */}
+        {!isEdit && (
+          <div>
+            <label style={labelStyle}>
+              Location name <span style={{ color: "var(--cr-brown)" }}>*</span>
+            </label>
+            <input
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Radio Bakery"
+              style={inputStyle}
+            />
+          </div>
+        )}
 
-        {/* Website */}
-        <div>
-          <label style={labelStyle}>
-            Website or social handle
-            {!isEdit && <span style={{ color: "var(--cr-brown)" }}> *</span>}
-            {isEdit && <span style={{ color: "#9C6B3C", fontWeight: 400 }}> (optional)</span>}
-          </label>
-          <input
-            required={!isEdit}
-            value={website}
-            onChange={(e) => setWebsite(e.target.value)}
-            placeholder="https://... or @handle"
-            style={inputStyle}
-          />
-        </div>
-
-        {/* Address */}
-        <div>
-          <label style={labelStyle}>
-            Address <span style={{ color: "#9C6B3C", fontWeight: 400 }}>(optional)</span>
-          </label>
-          <input
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="e.g. 226 Nassau Ave, Greenpoint, Brooklyn"
-            style={inputStyle}
-          />
-        </div>
+        {/* Website + Address — addition only */}
+        {!isEdit && (
+          <>
+            <div>
+              <label style={labelStyle}>
+                Website or social handle <span style={{ color: "var(--cr-brown)" }}>*</span>
+              </label>
+              <input
+                required
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                placeholder="https://... or @handle"
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>
+                Address <span style={{ color: "#9C6B3C", fontWeight: 400 }}>(optional)</span>
+              </label>
+              <input
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="e.g. 226 Nassau Ave, Greenpoint, Brooklyn"
+                style={inputStyle}
+              />
+            </div>
+          </>
+        )}
 
         {/* Comments */}
         <div>

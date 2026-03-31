@@ -2,119 +2,67 @@
 
 ## Current State
 
-**Last updated:** 2026-03-29
-**Last session summary:** Spec written and approved. Project ready to begin.
-**In progress:** Nothing yet
+**Last updated:** 2026-03-31
+**Last session summary:** Major post-MVP sprint. Google Places enrichment, redesigned popup cards, sidebar/footer polish, domain live, about page + contact form.
+
+**Done:**
+- Next.js 16 project scaffolded (App Router, TypeScript, Tailwind CSS 4, Turbopack)
+- Supabase `locations` table created with RLS + public read policy
+- 41 active locations seeded across all 5 boroughs
+- Mapbox GL JS integrated with dynamic import + `"use client"` wrapper
+- Custom SVG cinnamon roll pins (44×44px tap targets)
+- Auto-fit bounds on load (all pins visible)
+- Warm palette CSS variables (--cr-cream, --cr-brown, --cr-brown-dark)
+- Search & filter panel: name search, borough, neighborhood, type, open-on-day filters
+- Sidebar: 400px, Recently Added section, full location list, save/heart, nearby mode, surprise me
+- Clicking pin or sidebar item flies to location (zoom 14) + opens popup
+- **Popup card redesign** (2026-03-31): neighborhood/borough header, large name, type + rating + open days meta row, notes, "Featured by" tags, website + Instagram links
+- **Google Places enrichment** (2026-03-31): `google_place_id`, `google_rating`, `google_hours` added to all 41 locations via coordinate-based nearby search (correct branch matching). Rating links to Google Maps, always shows 1 decimal.
+- `location_type` values updated to Sentence case (Bakery, Café, Kiosk, Market, Pop-up, Restaurant)
+- Fixed footer bar (`#f5e6d3`) with Instagram handle + "About us" link — present on all pages
+- Header logo/name links to homepage on all pages
+- `/submit` page: Add a new spot + Suggest an edit forms (edit form streamlined — no redundant fields)
+- `/about` page: brand story + contact form (name optional, email + message required) → `contact_submissions` table
+- **Custom domain live**: cinnamonrolls.nyc (Squarespace DNS → Vercel, SSL auto-provisioned)
+- Page title + tagline: "cinnamonrolls.nyc - the ultimate map of the city's best swirls"
+- Inter font consistent across all pages including popup cards
+- Map style: `light-v11`
+
+**In progress:** Nothing
+
 **Blockers:** None
-**Next steps:** Set up the project (repo, Next.js, Supabase table, Mapbox account), then build the map.
 
----
-
-## Session Plan — 2026-03-30 (Heavy Mode)
-
-### What I'm building
-Full MVP: Next.js app with Mapbox GL JS map, Supabase data layer, custom SVG pins, branded popup cards, minimal header. Deploy to Vercel.
-
-### Files I'll touch / create
-- `app/page.tsx` — root page (full-screen map)
-- `app/layout.tsx` — root layout (fonts, globals, metadata)
-- `app/globals.css` — warm palette CSS variables
-- `components/Map.tsx` — client component: Mapbox init, pin rendering, popup logic
-- `components/Header.tsx` — minimal site name header
-- `lib/supabase.ts` — Supabase client singleton
-- `supabase/migrations/001_create_locations.sql` — schema (append-only)
-- `scripts/seed.ts` — seed script (present data first, insert after approval)
-- `next.config.ts` — transpile mapbox-gl
-- `package.json` — add mapbox-gl, @supabase/supabase-js
-
-### Steps (in order)
-1. `create-next-app` in the existing repo dir (TypeScript, Tailwind, App Router, no src/)
-2. Install `mapbox-gl`, `@supabase/supabase-js`
-3. Write SQL migration for `locations` table → provide for Supabase dashboard
-4. Research + compile seed data (15-20 locations, accurate lat/lng) → **STOP, present to Olivia for approval**
-5. Generate SVG cinnamon roll icon → **STOP, present to Olivia for approval**
-6. Build Map component (Mapbox init, fetch Supabase, render pins, auto-fit bounds)
-7. Build popup card (warm palette, display_name fallback, closed state)
-8. Build header + global styles
-9. Mobile QA (44px tap targets, East Village cluster)
-10. Push to GitHub → verify Vercel deploy
-
-### Expected outcome
-Live `.vercel.app` URL showing all ~15-20 approved pins on a full-screen NYC map, with branded popup cards on click.
-
-### What could go wrong
-- `create-next-app .` in a non-empty dir → use `--yes` flag, it handles this
-- Mapbox GL JS SSR issues in Next.js App Router → use `"use client"` + `dynamic()` with `ssr: false`
-- East Village pin cluster overlap at low zoom → verify 44px targets don't worsen it; Mapbox handles click prioritization
-- Supabase table creation requires service role key (not anon key) → write SQL migration, user runs it in dashboard
-
----
-
-## Tasks
-
-### Olivia — Before First Build Session
-
-- [x] Create GitHub repo (github.com/opapa662/cinnamonroll.nyc)
-- [x] Create Supabase project (free tier) + grab project URL and anon key
-- [x] Create Mapbox account (free tier) + grab access token
-- [ ] Add environment variables to `.env.local` (Mapbox token, Supabase URL, Supabase anon key) — do this after Claude Code initializes the project
-
-### Olivia — After Claude Code Pushes Initial Code
-
-- [ ] Connect repo to Vercel (needs code in repo first)
-
-### Olivia — During Build (Review Gates)
-
-- [ ] Review + approve seed data (locations, coordinates, names)
-- [ ] Review + approve SVG cinnamon roll pin icon
-- [ ] Final review of all pins + popups before launch
-
-### Claude Code — Project Setup
-
-- [ ] Initialize Next.js project
-- [ ] Set up Supabase `locations` table per schema in SPEC.md
-- [ ] Configure environment variables (`.env.local`)
-- [ ] Deploy initial skeleton to Vercel
-
-### Claude Code — Seed Data
-
-- [ ] Compile full list of ~15-20 locations with accurate lat/lng coordinates
-- [ ] Verify all neighborhoods and boroughs
-- [ ] Write seed script (`scripts/seed.ts`) to populate Supabase
-- [ ] Present seed data to Olivia for review before inserting
-- [ ] Run approved seed data into Supabase
-
-### Claude Code — Map
-
-- [ ] Integrate Mapbox GL JS into Next.js
-- [ ] Fetch locations from Supabase on page load
-- [ ] Render all locations as markers on the map
-- [ ] Auto-fit map bounds to show all pins on load
-- [ ] Design + implement custom SVG cinnamon roll pin icon
-- [ ] Present pin icon to Olivia for approval
-
-### Claude Code — Popup Card
-
-- [ ] Design branded popup card (warm palette, bakery name)
-- [ ] Implement click handler on pins to show popup
-- [ ] Ensure popup works well on mobile (doesn't obscure full screen)
-
-### Claude Code — Design & Polish
-
-- [ ] Set up warm/clean color palette (cream background, cinnamon accents)
-- [ ] Add minimal header with site name
-- [ ] Mobile-responsive layout (full-screen map, tap-friendly targets)
-- [ ] Performance check — page loads under 3 seconds on mobile
-
-### Claude Code — Launch
-
-- [ ] Final review of all pins + popups
-- [ ] Deploy to Vercel production
-- [ ] Verify `.vercel.app` URL works on desktop + mobile
-- [ ] Ship it
+**Next steps (post-MVP P1):**
+- ~~Borough/neighborhood filtering~~ ✓ done
+- ~~Enrich popup cards~~ ✓ done (rating, hours, source tags, links)
+- SEO pages: individual spot pages, neighborhood pages
 
 ---
 
 ## Lessons
 
-<!-- Add entries here whenever a mistake is made or a correction is given. -->
+### Technical
+- **Next.js 16: `ssr: false` not allowed in Server Components.** Wrap the `dynamic(() => import(...), { ssr: false })` call in a separate `"use client"` component (MapWrapper pattern).
+- **React StrictMode double-mounts `useEffect`.** Use `initializedRef = useRef(false)` set to `true` before the async init — prevents double Mapbox initialization.
+- **Mapbox GL JS needs a sized container at init time.** If the container has 0 dimensions, no tiles are requested and the map stays blank. Fix: `position: fixed` with explicit `top/left/right/bottom` on the container, call `map.resize()` in `load` event before `fitBounds()`.
+- **Vercel needs `vercel.json` with `{"framework": "nextjs"}` if the project was created before code existed.** Without it, Vercel treats it as a static site and returns 404 NOT_FOUND.
+- **`NEXT_PUBLIC_` env vars must be added in the Vercel dashboard** and require a redeploy — baked into the client bundle at build time.
+- **Mapbox popup cards are raw HTML strings** — CSS variables (`var(--font-inter)`) don't work inside them. Reference the font by name: `font-family:'Inter',sans-serif`.
+- **Google Places nearby search (`rankby=distance`) is more accurate than text search for multi-location spots.** Text search uses a loose location bias; nearby search strictly ranks by distance from coordinates, ensuring the correct branch is matched.
+- **Google Places API key website restrictions break server-side scripts.** Use IP restrictions instead, or leave unrestricted for enrichment-only keys never exposed to the browser.
+- **Supabase check constraints block case/value changes.** Drop the constraint first (`alter table locations drop constraint ...`), update the values, then re-add if needed.
+- **Top-level await doesn't work with tsx in CJS mode.** Wrap in `async function main() {}` and call it — same pattern as the enrichment script.
+- **Squarespace DNS + Vercel:** Add `A` record `@` → `76.76.21.21` and `CNAME` `www` → Vercel's assigned CNAME. Propagates in 10–30 min.
+- **Admin login uses `ADMIN_TOKEN` env var** — must be set in Vercel dashboard (Settings → Environment Variables) or login will always fail in production.
+
+### Design decisions
+- **Popup card layout** (finalised 2026-03-31): neighbourhood · borough (small caps, top) → large bold name → type | ⭐ rating | open days (one meta row, pipe-separated) → notes → "Featured by" tags → divider → website + Instagram links. Warm cinnamon palette throughout.
+- **"Featured by" tags:** All sources use the same warm amber style (`#fff8ed` bg, `#8B4513` text) — consistent, not colour-coded by publication.
+- **Rating always shows 1 decimal place** (e.g. 4.0 not 4). Clicking the rating opens Google Maps in a new tab via `place_id`.
+- **Sidebar width: 400px** on desktop — wide enough for place names to read comfortably without truncating.
+- **Zoom level on pin/sidebar click: 14** — close enough to orient, not so close it feels claustrophobic.
+- **Footer:** Fixed 36px bar at bottom, `#f5e6d3` (same as sidebar action bar), right-aligned links. Present on all pages via root layout.
+- **Map style: `light-v11`** — tried `outdoors-v12`, settled on light for cleaner readability with the warm pin icons.
+- **Font: Inter throughout** — including popup cards. No display font for now; Inter at various weights carries the brand well.
+- **location_type in Sentence case** (Bakery, Café, etc.) — was lowercase snake_case in DB, updated after dropping check constraint.
+- **Submit page edit form** — name, website, address fields hidden in "Suggest an edit" mode since the user already selected the location from a dropdown.

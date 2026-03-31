@@ -16,7 +16,7 @@ export default function Header({ count, backLink }: { count: number; backLink?: 
         right: 0,
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/icon.png" alt="" style={{ width: 24, height: 24, objectFit: "contain", flexShrink: 0 }} />
         <div style={{ fontFamily: "var(--font-inter), -apple-system, sans-serif" }}>
@@ -27,7 +27,7 @@ export default function Header({ count, backLink }: { count: number; backLink?: 
             the ultimate map of the city&apos;s best swirls
           </div>
         </div>
-      </div>
+      </Link>
       <div style={{ display: "flex", alignItems: "center", gap: 24, fontFamily: "var(--font-inter), -apple-system, sans-serif" }}>
         {backLink && (
           <Link href="/" style={{ fontSize: "13px", color: "#9C6B3C", textDecoration: "none", fontWeight: 500 }}>
