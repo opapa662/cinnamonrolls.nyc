@@ -18,7 +18,9 @@ export default function Header({ count, backLink }: { count: number; backLink?: 
     >
       <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icon.png" alt="" style={{ width: 24, height: 24, objectFit: "contain", flexShrink: 0 }} />
+        <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <img src="/icon.png" alt="" style={{ width: 22, height: 22, objectFit: "contain" }} />
+        </div>
         <div style={{ fontFamily: "var(--font-inter), -apple-system, sans-serif" }}>
           <div className="header-title" style={{ fontWeight: 600, color: "var(--cr-cream)", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
             cinnamonrolls.nyc

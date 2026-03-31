@@ -39,3 +39,44 @@ body {
 .cr-popup.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
   border-left-color: var(--cr-cream);
 }
+
+/* Header responsive sizes */
+.header-title   { font-size: 13px; }
+.header-tagline { font-size: 10px; }
+.header-count   { font-size: 13px; }
+.header-sub     { font-size: 10px; }
+
+@media (max-width: 767px) {
+  .header-title   { font-size: 12px; }
+  .header-tagline { font-size: 9px; }
+  .header-count   { font-size: 12px; }
+  .header-sub     { font-size: 9px; }
+}
+
+/* Search panel positioning */
+.search-panel {
+  position: fixed;
+  top: 68px;
+  right: 16px;
+  width: 320px;
+}
+
+@media (max-width: 767px) {
+  .search-panel {
+    top: 68px;
+    left: 8px;
+    right: 8px;
+    width: auto;
+    border-radius: 12px;
+  }
+}
+
+/* Mobile / desktop visibility */
+@media (max-width: 767px) {
+  .desktop-sidebar { display: none !important; }
+  .desktop-footer { display: none !important; }
+  .back-to-map { display: none !important; }
+}
+@media (min-width: 768px) {
+  .mobile-only { display: none !important; }
+}
