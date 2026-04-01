@@ -8,7 +8,7 @@ export const revalidate = 0;
 export default async function Home() {
   const { data: locations, count } = await supabase
     .from("locations")
-    .select("id, name, display_name, latitude, longitude, neighborhood, borough, notes, website, instagram, location_type, days_open, created_at, source, google_place_id, google_rating, google_hours", { count: "exact" })
+    .select("id, name, display_name, latitude, longitude, neighborhood, borough, notes, website, instagram, location_type, days_open, created_at, mentions, google_place_id, google_rating, google_hours", { count: "exact" })
     .eq("status", "active")
     .order("name");
 

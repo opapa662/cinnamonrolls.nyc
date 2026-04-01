@@ -1,0 +1,332 @@
+[
+  {
+    "id": "0184cb96-cbbf-41c8-aa24-bc3079a6940d",
+    "name": "Loser's Eating House",
+    "notes": "Pre-order only via weekly Instagram drops; sells out instantly.",
+    "review": "\"Face-sized sourdough brioche with olive oil frosting, flaky salt, and glaze oozing from every layer — at $21 it feeds six.\""
+  },
+  {
+    "id": "10f1d3cd-5cdf-4602-809f-b22f36861aba",
+    "name": "American Bar",
+    "notes": "Weekend brunch only; croissant-style bun ($10).",
+    "review": "\"Croissant-like warm rolls with cream cheese frosting on the side so you can lather on as much as you desire.\""
+  },
+  {
+    "id": "13c8789d-cff0-4916-82cf-81d45d61b3b8",
+    "name": "Little Red Kitchen Bake Shop",
+    "notes": "Weekend-only; sells out fast — preorder online.",
+    "review": "\"Milk bread dough with a silky, subtle cream cheese frosting and lots of swirls — optimal ratio of dough to filling.\""
+  },
+  {
+    "id": "1497aec7-2cbd-4d18-83bf-f85a3044b244",
+    "name": "Ole & Steen - Upper East Side",
+    "notes": "Danish chain; shareable pull-apart braid, not a traditional roll.",
+    "review": "\"Braided in classic Danish style — lighter and less sweet than American counterparts, perfect with a black coffee.\""
+  },
+  {
+    "id": "15537d16-2c22-4ee8-a753-c9ec576f3b13",
+    "name": "Ole & Steen - Midtown East",
+    "notes": "Danish chain; shareable pull-apart braid, not a traditional roll.",
+    "review": "\"Braided in classic Danish style — lighter and less sweet than American counterparts, perfect with a black coffee.\""
+  },
+  {
+    "id": "1942a2c2-358f-4f74-8959-2e9ec1e9c466",
+    "name": "Ole & Steen - Bryant Park",
+    "notes": "Danish chain; shareable pull-apart braid, not a traditional roll.",
+    "review": "\"Braided in classic Danish style — lighter and less sweet than American counterparts, perfect with a black coffee.\""
+  },
+  {
+    "id": "bc84ca64-43bf-4138-b40c-17d27a78268f",
+    "name": "Ole & Steen - Union Square",
+    "notes": "Danish chain; shareable pull-apart braid, not a traditional roll.",
+    "review": "\"Braided in classic Danish style — lighter and less sweet than American counterparts, perfect with a black coffee.\""
+  },
+  {
+    "id": "14c4baec-685a-4dd9-a8df-7333647a32f6",
+    "name": "Barachou - West Village",
+    "notes": "Newer location (2022); French cream puff shop.",
+    "review": "\"Sleeper-hit cinnamon roll at a cream puff shop — doughy and gooey with a thin vanilla glaze that complements rather than overwhelms.\""
+  },
+  {
+    "id": "c61613f4-fea5-4ce8-82b2-04ea2bb0d1b4",
+    "name": "Barachou - Upper West Side",
+    "notes": "The original (2019); French cream puff shop.",
+    "review": "\"Sleeper-hit cinnamon roll at a cream puff shop — doughy and gooey with a thin vanilla glaze that complements rather than overwhelms.\""
+  },
+  {
+    "id": "17c29ae2-bacf-4d8d-845e-35335389ab65",
+    "name": "Hani's Bakery & Café",
+    "notes": "Gramercy Tavern alum; malted bun is the bestseller.",
+    "review": "\"So expertly frosted you can't see the dough underneath — malted milk cream cheese frosting with just an idea of cardamom.\""
+  },
+  {
+    "id": "1824efae-55a2-4cce-8843-1f0a359581c9",
+    "name": "Serano Bakery",
+    "notes": "Greek-American bakery; open late until 10:30pm+.",
+    "review": "\"A 4.9-star Astoria favorite — traditional, homey pastries and a rare evening cinnamon roll option in Queens.\""
+  },
+  {
+    "id": "1ce6acfb-c080-48f9-a19d-4c30f8d64b02",
+    "name": "Bakeri - Williamsburg",
+    "notes": "Scratch-made; sells out fast — arrive early.",
+    "review": "\"Dense and gooey with a delicious, thick layer of frosting — a charming neighborhood café where everything is made from scratch.\""
+  },
+  {
+    "id": "d505d9e6-2cae-4199-b3d6-40b6a16e3b3c",
+    "name": "Bakeri - Greenpoint",
+    "notes": "Scratch-made; sells out fast — arrive early.",
+    "review": "\"Dense and gooey with a delicious, thick layer of frosting — a charming neighborhood café where everything is made from scratch.\""
+  },
+  {
+    "id": "1fdbccbf-f493-4afb-8569-46153f6f340e",
+    "name": "Leland Eating & Drinking House",
+    "notes": "Full-service restaurant; standout orange zest cinnamon roll.",
+    "review": "\"You've gotta try the orange zest cinnamon rolls — come for the roll, stay for the full menu.\""
+  },
+  {
+    "id": "a5c75a4c-bcfe-4b92-9f50-b9778b3ab349",
+    "name": "Mah-Ze-Dahr - Downtown",
+    "notes": "They call it a sticky bun; weekends only.",
+    "review": "\"Deliciously sweet and cinnamony with smooth frosting drizzled on top — as close to the platonic ideal of a cinnamon roll as you can get.\""
+  },
+  {
+    "id": "2c5b4a9d-a50b-4790-8201-822b0cae8708",
+    "name": "Winner - Park Slope",
+    "notes": "Flagship; kouign-amann-style roll, daily 7–11am.",
+    "review": "\"Sticky like a kouign-amann with cream cheese frosting spiked with lemon juice — the caramelized underside tastes like caramel.\""
+  },
+  {
+    "id": "fac22a7f-a669-4898-9718-6910141bb50d",
+    "name": "Winner - Prospect Park",
+    "notes": "Seasonal park kiosk; check hours before visiting.",
+    "review": "\"Sticky like a kouign-amann with cream cheese frosting spiked with lemon juice — the caramelized underside tastes like caramel.\""
+  },
+  {
+    "id": "2d546e49-f62c-4390-b96c-211a910a39ae",
+    "name": "Michaeli Bakery",
+    "notes": "Israeli-American bakery; closed Saturdays.",
+    "review": "\"A hidden gem alongside their famous babka — the pastries reflect Israeli and American baking traditions beautifully.\""
+  },
+  {
+    "id": "32c8dda2-ded7-4f62-8432-3a5148db99ab",
+    "name": "Super Nice - East Harlem",
+    "notes": "Rare quality cinnamon roll option above 96th Street.",
+    "review": "\"Great coffee and fresh-baked pastries in a warm, no-frills setting — perfect for a low-key morning treat.\""
+  },
+  {
+    "id": "73445c78-7f79-45f0-baf6-8348c478b10e",
+    "name": "Super Nice - Manhattan Valley",
+    "notes": "Rare quality cinnamon roll option above 96th Street.",
+    "review": "\"Great coffee and fresh-baked pastries in a warm, no-frills setting — perfect for a low-key morning treat.\""
+  },
+  {
+    "id": "346f4021-4f9d-4db6-969f-6c4c9f8b1504",
+    "name": "Rigor Hill Market",
+    "notes": "Rated 9.7/10 by The Carboholic; frozen pans available ($25/8).",
+    "review": "\"Light and airy, almost like a croissant, with a thin icing on top that shatters like peanut brittle.\""
+  },
+  {
+    "id": "402c2aed-e03b-4637-80d9-7be0d8d0e957",
+    "name": "The Noortwyck",
+    "notes": "Weekend brunch only; Eleven Madison Park alum team.",
+    "review": "\"Generously frosted, warm, and buttery — a fine-dining pedigree pastry that rivals dedicated bakeries at brunch-friendly prices.\""
+  },
+  {
+    "id": "4445709c-1dbd-4fcf-97e5-3172729414b7",
+    "name": "Petit Chou",
+    "notes": "Eclair specialist; check Instagram for seasonal flavors.",
+    "review": "\"Light and fluffy with a conservative but well-balanced cinnamon filling — a solid option, especially paired with one of their eclairs.\""
+  },
+  {
+    "id": "4d227694-8a03-4374-9f8a-525330c4a2fc",
+    "name": "Peter Pan Donut & Pastry Shop",
+    "notes": "NYC institution since 1953; doors open at 4:30am daily.",
+    "review": "\"Fried donut dough dusted with cinnamon, slathered with glaze, and topped with homemade buttercream — the value is impossible to beat.\""
+  },
+  {
+    "id": "4ecbb739-ff09-4f54-ac5f-0409b9e59a3d",
+    "name": "Spirals",
+    "notes": "Dedicated cinnamon roll shop; each topped with a spiral sugar cookie.",
+    "review": "\"Expertly fluffy with equal parts cinnamon glaze and cream cheese frosting — say yes when they ask if you want yours warmed.\""
+  },
+  {
+    "id": "57244edc-6628-46b6-85de-8d6b7939a786",
+    "name": "KYU",
+    "notes": "Wood-fired restaurant; $15 dessert, not a bakery stop.",
+    "review": "\"Soupy black sugar innards frosted with a chai-flavored glaze, served warm — transformational.\""
+  },
+  {
+    "id": "8198b85b-0fd1-468c-b202-60a30306b2ea",
+    "name": "Sunday Morning - East Village",
+    "notes": "The original; 10 rotating flavors daily, sells out early.",
+    "review": "\"The Chocolate Babka roll is light, fluffy, and memorable — arrive before 11am for the best selection.\""
+  },
+  {
+    "id": "59be23fb-944a-4b81-baad-7bdbf75cc961",
+    "name": "Sunday Morning - NoMad",
+    "notes": "Newer location; same flavors, less hectic than the original.",
+    "review": "\"The Chocolate Babka roll is light, fluffy, and memorable — arrive before 11am for the best selection.\""
+  },
+  {
+    "id": "8f06c36a-6948-4105-b375-fef8463a97b7",
+    "name": "Red Gate Bakery",
+    "notes": "Brown butter rolls Wed/Thu; specialty flavors Fri/Sat.",
+    "review": "\"Crisp golden-brown edges with a signature drizzle of brown butter-cinnamon cinnyGOO on top — limited quantity, check Instagram.\""
+  },
+  {
+    "id": "59d0525a-cce4-456c-8e41-d65511b54380",
+    "name": "Bourke Street Bakery",
+    "notes": "Australian-founded; pastries ship nationally via Goldbelly.",
+    "review": "\"Less frosting-heavy than American versions, more about the dough and spice — a reliable daily option with a strong pastry program.\""
+  },
+  {
+    "id": "61f538b5-ad8c-46f6-b8bb-6e6ac9dcc6dd",
+    "name": "Ceremonia Bakeshop",
+    "notes": "Closed Mon–Tue; also famous for their breakfast burrito.",
+    "review": "\"Like a collaboration between a classic cinnamon bun and a Krispy Kreme donut — glazed, pillowy, and addictive.\""
+  },
+  {
+    "id": "64bc7142-f3c9-4e5c-8b08-77d17be57895",
+    "name": "L'Appartement 4F - Brooklyn Heights",
+    "notes": "The original; laminated roll rated 9.5/10 by The Carboholic.",
+    "review": "\"Crisp and flaky with a butter-forward personality and a thick gob of cream cheese icing — elegant enough for a solo pastry outing.\""
+  },
+  {
+    "id": "80acc2a5-27a9-426f-b0fa-e7420d80bf15",
+    "name": "L'Appartement 4F - West Village",
+    "notes": "Newer expansion (Feb 2025); same laminated roll.",
+    "review": "\"Crisp and flaky with a butter-forward personality and a thick gob of cream cheese icing — elegant enough for a solo pastry outing.\""
+  },
+  {
+    "id": "7206b087-9130-4df2-b4fa-80947f8065d1",
+    "name": "Baked",
+    "notes": "Red Hook staple; dense roll with caramelized sugar bottom.",
+    "review": "\"The sugar gets crunchy and caramelized toward the bottom — a great pastry to enjoy with your morning coffee.\""
+  },
+  {
+    "id": "7775741f-3bcf-4576-ba52-85f5ac80e0eb",
+    "name": "Ciao Gloria",
+    "notes": "From a Baked alum; sells out daily — come early.",
+    "review": "\"If a cinnamon roll emoji existed, it might look like this one — fluffy dough, filling straight from the cinnamon tree, cream cheese icing worthy of a carrot cake.\""
+  },
+  {
+    "id": "e46baed3-c630-445b-b968-7efc0d4dc82c",
+    "name": "Breads Bakery - Union Square",
+    "notes": "Flagship; super-flaky cinnamon sugar roll ($5.25).",
+    "review": "\"Brioche-based with a subtle sheen of vanilla and egg — an understated, refined roll from a bakery better known for babka.\""
+  },
+  {
+    "id": "947a50ba-a175-4e9e-88fd-cdcb194552e1",
+    "name": "Breads Bakery - Bryant Park",
+    "notes": "Kiosk format; same roll at just $3.21, supply varies.",
+    "review": "\"Brioche-based with a subtle sheen of vanilla and egg — an understated, refined roll from a bakery better known for babka.\""
+  },
+  {
+    "id": "efe620a7-a1d6-4903-b98f-674a315e834d",
+    "name": "Chloe",
+    "notes": "100% vegan; reopened 2024 at original By Chloe space.",
+    "review": "\"A reliable vegan cinnamon roll that satisfies without dairy or eggs — pair it with one of their signature plant-based bowls.\""
+  },
+  {
+    "id": "f4f44515-6537-4245-b7b4-c664f3106a41",
+    "name": "Cloudy Donut Co. - Brooklyn Heights",
+    "notes": "100% vegan, Black-owned; Fri–Sun only.",
+    "review": "\"This vegan donut shop has no business making such a good cinnamon roll — tight swirl, great shape, way better than their donuts.\""
+  },
+  {
+    "id": "a6a65c45-029d-4034-9af8-17724c19e257",
+    "name": "Cloudy Donut Co. - Nolita",
+    "notes": "100% vegan, Black-owned; Fri–Sun only.",
+    "review": "\"This vegan donut shop has no business making such a good cinnamon roll — tight swirl, great shape, way better than their donuts.\""
+  },
+  {
+    "id": "f991bc34-6103-485c-bfee-70e2c8f96eee",
+    "name": "Benji's Buns",
+    "notes": "Cinnamon-roll-only; open until midnight weekends, baked hourly.",
+    "review": "\"The original roll is extra doughy with strong cinnamon throughout — huge, you'll need a fork and a table.\""
+  },
+  {
+    "id": "b214df04-2e4e-4823-845a-974f2e1be3f9",
+    "name": "Tall Poppy",
+    "notes": "Australian-founded, small-batch; sells out by afternoon.",
+    "review": "\"All the elements of a Cinnabon but chewier and more textured — made from croissant dough scraps with thick glaze seeping into every layer.\""
+  },
+  {
+    "id": "b2197f98-26f0-4842-ab54-f8da39b92ab6",
+    "name": "Radio Bakery - Greenpoint",
+    "notes": "The original from the Rolo's team; open until sold out.",
+    "review": "\"More pastry-with-coffee than gooey showstopper, but the lamination and baking quality are hard to beat.\""
+  },
+  {
+    "id": "fed85f71-93ac-4bfe-a5f5-f5e8146dce9f",
+    "name": "Radio Bakery - Prospect Heights",
+    "notes": "Newer location (Mar 2025); less competition for stock.",
+    "review": "\"More pastry-with-coffee than gooey showstopper, but the lamination and baking quality are hard to beat.\""
+  },
+  {
+    "id": "c96e3988-f87f-45ef-971e-511455efcfeb",
+    "name": "Welcome Home",
+    "notes": "NYT Bakery of the Year; closed Tuesdays, sells out daily.",
+    "review": "\"Cinnabon's greatest impersonator — smothered with glaze, dark brown bottom, globs of sticky cinnamon sugar. Ask for a center piece.\""
+  },
+  {
+    "id": "cc4994a9-3c46-4975-80ed-dab46acf2a14",
+    "name": "Breadivore",
+    "notes": "Wed–Sun only; babka-adjacent flaky layers.",
+    "review": "\"Filling so plentiful that every layer tastes like the center of a regular roll, with thick cream cheese frosting — great for sharing, if you must.\""
+  },
+  {
+    "id": "cd2befbb-82aa-497b-839d-72f9e911fefc",
+    "name": "Petee's Pie Company - Clinton Hill",
+    "notes": "Pie shop first; cinnamon roll is a pleasant surprise.",
+    "review": "\"Buttery, pie-crust-adjacent pastry with warm spice — open daily until 11pm, which is rare for a cinnamon roll fix.\""
+  },
+  {
+    "id": "9cde502a-0c85-462f-91cf-c84cc4692d9b",
+    "name": "Petee's Pie Company - Lower East Side",
+    "notes": "Pie shop first; cinnamon roll is a pleasant surprise.",
+    "review": "\"Buttery, pie-crust-adjacent pastry with warm spice — open daily until 11pm, which is rare for a cinnamon roll fix.\""
+  },
+  {
+    "id": "d78f2d61-b709-4e29-927d-676f2618f210",
+    "name": "Pies 'n' Thighs",
+    "notes": "Southern comfort; cinnamon roll made from donut dough.",
+    "review": "\"Donut-dough cinnamon roll with cream cheese frosting — unapologetically indulgent, exactly what you'd expect here.\""
+  },
+  {
+    "id": "d7fc4859-fcc4-4e36-b030-23886c523282",
+    "name": "L'imprimerie",
+    "notes": "French bakery; open daily 7am–6pm.",
+    "review": "\"Tastes like Christmas thanks to a heavy dose of cinnamon, with creamy cheesy icing and pleasantly flaky dough.\""
+  },
+  {
+    "id": "d8b5abe0-1175-46e7-bdad-5001608c2331",
+    "name": "Cinnaholic",
+    "notes": "Build-your-own vegan chain; evenings only (5pm+).",
+    "review": "\"Pick from dozens of frosting flavors and toppings on a fully vegan roll — not artisanal, but fun and customizable.\""
+  },
+  {
+    "id": "918a62d4-9704-442c-9eac-e72bc3a9a040",
+    "name": "One Girl Cookies",
+    "notes": "Cookie shop; new cinnamon roll at $4.75.",
+    "review": "\"Light, fluffy, and not too sweet — in a market of $7+ rolls, a $4.75 option with this much charm stands out.\""
+  },
+  {
+    "id": "c6cbd53e-08e2-424e-9428-8a98274956a2",
+    "name": "Bub's Bakery",
+    "notes": "Under-the-radar NoHo bakery; no lines.",
+    "review": "\"A solid everyday pastry stop without the hype or wait of trendier nearby spots — consistent quality across the board.\""
+  },
+  {
+    "id": "e1f7017d-1e83-4a94-9057-f94663e263fc",
+    "name": "Yardsale Cafe",
+    "notes": "Part café, part vintage shop; browse vinyl while you eat.",
+    "review": "\"Babka-adjacent pastry layers in a 4.9-star café where you can shop vintage finds — no other cinnamon roll spot has this vibe.\""
+  },
+  {
+    "id": "fc659678-7155-48c1-bf21-fdee19306c58",
+    "name": "Noa, a Café",
+    "notes": "Swedish-style cardamom bun; open daily 7am–4:30pm.",
+    "review": "\"Braided and spiced with cardamom — a completely different, lighter experience from the gooey American style, perfect with specialty coffee.\""
+  }
+]

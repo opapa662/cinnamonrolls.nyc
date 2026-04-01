@@ -283,7 +283,7 @@ export default function Sidebar({
           >
             {btn.icon}
             <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.01em", lineHeight: 1.2, textAlign: "center" }}>
-              {btn.label}
+              {btn.label === "Saved" && savedIds.size > 0 ? `Saved (${savedIds.size})` : btn.label}
             </span>
           </button>
         );})}

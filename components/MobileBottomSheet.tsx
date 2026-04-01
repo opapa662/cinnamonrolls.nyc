@@ -3,7 +3,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { LocationItem, RecentlyAddedItem, sectionLabel, type SidebarLocation } from "@/components/Sidebar";
 
-const PEEK_VISIBLE = 116; // handle + label + ~1 recently added row
+const PEEK_VISIBLE = 72; // handle (32) + count row (36) + 4px breathing room
 
 type Snap = "peek" | "full" | "collapsed";
 
@@ -154,10 +154,10 @@ const MobileBottomSheet = forwardRef<MobileSheetHandle, Props>(function MobileBo
       ref={sheetRef}
       style={{
         position: "fixed",
+        top: 68,
         bottom: 80,
         left: 0,
         right: 0,
-        height: "calc(100vh - 148px)",
         borderRadius: "16px 16px 0 0",
         background: "var(--cr-cream)",
         boxShadow: "0 -4px 20px rgba(139,69,19,0.14)",
@@ -198,6 +198,24 @@ const MobileBottomSheet = forwardRef<MobileSheetHandle, Props>(function MobileBo
         }}
       >
         <div style={{ width: 36, height: 4, borderRadius: 2, background: "rgba(139,69,19,0.28)" }} />
+      </div>
+
+      {/* Persistent count row — always visible in peek state */}
+      <div style={{
+        flexShrink: 0,
+        height: 36,
+        display: "flex",
+        alignItems: "center",
+        padding: "0 14px",
+        borderBottom: "1px solid rgba(139,69,19,0.08)",
+      }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: "#9C6B3C" }}>
+          {nearbyMode
+            ? (nearbyRadius != null ? `${filteredLocations.length} nearby rolls` : "Nearby rolls")
+            : savedMode
+            ? `${filteredLocations.length} saved rolls`
+            : `${filteredLocations.length} of ${locations.length} rolls`}
+        </span>
       </div>
 
       {/* Scrollable content */}
@@ -251,11 +269,6 @@ const MobileBottomSheet = forwardRef<MobileSheetHandle, Props>(function MobileBo
               >
                 Close ×
               </button>
-            )}
-            {!nearbyMode && !savedMode && (
-              <span style={{ fontSize: 11, color: "#b08060", fontWeight: 500 }}>
-                {`${filteredLocations.length} of ${locations.length}`}
-              </span>
             )}
             {isFiltered && !nearbyMode && !savedMode && (
               <button

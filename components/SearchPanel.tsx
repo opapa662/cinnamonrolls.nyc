@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { SidebarLocation } from "@/components/Sidebar";
 
 export interface Filters {
@@ -42,13 +42,13 @@ function toggle(arr: string[], val: string): string[] {
   return arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val];
 }
 
-function Chip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+function Chip({ label, active, onClick, compact }: { label: string; active: boolean; onClick: () => void; compact?: boolean }) {
   return (
     <button
       onClick={onClick}
       style={{
-        padding: "4px 11px",
-        fontSize: 11,
+        padding: compact ? "4px 7px" : "4px 11px",
+        fontSize: compact ? 11 : 11,
         fontWeight: 600,
         borderRadius: 20,
         border: `1.5px solid ${active ? "var(--cr-brown)" : "rgba(139,69,19,0.22)"}`,
@@ -70,10 +70,20 @@ interface SearchPanelProps {
   onChange: (f: Filters) => void;
   onClose: () => void;
   locations: SidebarLocation[];
+  filteredCount: number;
 }
 
-export default function SearchPanel({ filters, onChange, onClose, locations }: SearchPanelProps) {
+export default function SearchPanel({ filters, onChange, onClose, locations, filteredCount }: SearchPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [nameInputOpen, setNameInputOpen] = useState(() =>
+    (typeof window !== "undefined" && window.innerWidth >= 768) || !!filters.query,
+  );
+
+  function openNameInput() {
+    setNameInputOpen(true);
+    setTimeout(() => inputRef.current?.focus(), 50);
+  }
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -97,16 +107,13 @@ export default function SearchPanel({ filters, onChange, onClose, locations }: S
   return (
     <div
       ref={panelRef}
+      className="search-panel"
       style={{
-        position: "fixed",
-        top: 68,
-        right: 16,
-        width: 320,
         background: "var(--cr-cream)",
         border: "1px solid rgba(139,69,19,0.15)",
         borderRadius: 12,
         boxShadow: "0 8px 32px rgba(139,69,19,0.15)",
-        zIndex: 15,
+        zIndex: 50,
         fontFamily: "var(--font-inter), -apple-system, sans-serif",
         overflow: "hidden",
       }}
@@ -123,6 +130,11 @@ export default function SearchPanel({ filters, onChange, onClose, locations }: S
       >
         <span style={{ fontSize: 12, fontWeight: 700, color: "var(--cr-brown-dark)", letterSpacing: "0.01em" }}>
           Search & Filter
+          {isActive && (
+            <span style={{ fontWeight: 500, color: "#9C6B3C", marginLeft: 6 }}>
+              ({filteredCount} of {locations.length})
+            </span>
+          )}
         </span>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           {isActive && (
@@ -135,7 +147,18 @@ export default function SearchPanel({ filters, onChange, onClose, locations }: S
           )}
           <button
             onClick={onClose}
-            style={{ background: "none", border: "none", cursor: "pointer", color: "#9C6B3C", padding: "0 2px", fontSize: 14, lineHeight: 1, fontFamily: "inherit" }}
+            style={{
+              background: "rgba(139,69,19,0.1)",
+              border: "none",
+              borderRadius: 6,
+              cursor: "pointer",
+              color: "var(--cr-brown)",
+              padding: "4px 8px",
+              fontSize: 13,
+              fontWeight: 600,
+              lineHeight: 1,
+              fontFamily: "inherit",
+            }}
           >
             ✕
           </button>
@@ -149,30 +172,50 @@ export default function SearchPanel({ filters, onChange, onClose, locations }: S
           display: "flex",
           flexDirection: "column",
           gap: 16,
-          maxHeight: "calc(100vh - 150px)",
+          maxHeight: "calc(100vh - 120px)",
           overflowY: "auto",
         }}
       >
         {/* Name search */}
-        <input
-          type="text"
-          placeholder="Search by name…"
-          value={filters.query}
-          onChange={(e) => onChange({ ...filters, query: e.target.value })}
-          autoFocus
-          style={{
-            width: "100%",
-            padding: "8px 10px",
-            fontSize: 13,
-            color: "var(--cr-brown-dark)",
-            background: "#fff",
-            border: "1px solid rgba(139,69,19,0.2)",
-            borderRadius: 6,
-            outline: "none",
-            boxSizing: "border-box",
-            fontFamily: "inherit",
-          }}
-        />
+        {nameInputOpen ? (
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Search by name…"
+            value={filters.query}
+            onChange={(e) => onChange({ ...filters, query: e.target.value })}
+            style={{
+              width: "100%",
+              padding: "8px 10px",
+              fontSize: 13,
+              color: "var(--cr-brown-dark)",
+              background: "#fff",
+              border: "1px solid rgba(139,69,19,0.2)",
+              borderRadius: 6,
+              outline: "none",
+              boxSizing: "border-box",
+              fontFamily: "inherit",
+            }}
+          />
+        ) : (
+          <button
+            onClick={openNameInput}
+            style={{
+              width: "100%",
+              padding: "8px 10px",
+              fontSize: 13,
+              color: "rgba(139,69,19,0.45)",
+              background: "#fff",
+              border: "1px solid rgba(139,69,19,0.2)",
+              borderRadius: 6,
+              cursor: "text",
+              textAlign: "left",
+              fontFamily: "inherit",
+            }}
+          >
+            Search by name…
+          </button>
+        )}
 
         {/* Borough */}
         {uniqueBoroughs.length > 0 && (
@@ -211,13 +254,14 @@ export default function SearchPanel({ filters, onChange, onClose, locations }: S
         {/* Day */}
         <div>
           <div style={sectionLabel}>Open on</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          <div style={{ display: "flex", flexWrap: "nowrap", gap: 5 }}>
             {DAYS.map((d) => (
               <Chip
                 key={d}
                 label={DAY_SHORT[d]}
                 active={filters.days.includes(d)}
                 onClick={() => onChange({ ...filters, days: toggle(filters.days, d) })}
+                compact
               />
             ))}
           </div>

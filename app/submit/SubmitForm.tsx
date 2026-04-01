@@ -202,7 +202,7 @@ export default function SubmitForm() {
             onChange={(e) => setComments(e.target.value)}
             placeholder={isEdit ? "Describe what's out of date or incorrect…" : "Hours, seasonal availability, what makes it special…"}
             rows={4}
-            style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }}
+            style={{ ...inputStyle, resize: "none", lineHeight: 1.6 }}
           />
         </div>
 

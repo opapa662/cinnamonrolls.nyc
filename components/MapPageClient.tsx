@@ -347,6 +347,7 @@ export default function MapPageClient({ locations }: MapPageClientProps) {
           onChange={setFilters}
           onClose={() => { setSearchOpen(false); mobileSheetRef.current?.peek(); }}
           locations={locations}
+          filteredCount={filteredLocations.length}
         />
       )}
     </div>

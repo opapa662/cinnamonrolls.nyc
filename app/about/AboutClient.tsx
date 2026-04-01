@@ -80,7 +80,7 @@ export default function AboutClient() {
           onChange={(e) => setMessage(e.target.value)}
           placeholder="What's on your mind?"
           rows={5}
-          style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }}
+          style={{ ...inputStyle, resize: "none", lineHeight: 1.6 }}
         />
       </div>
 

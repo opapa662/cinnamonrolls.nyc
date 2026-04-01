@@ -1,9 +1,17 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Footer from "@/components/Footer";
+import MobileFooter from "@/components/MobileFooter";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   title: "cinnamonrolls.nyc - the ultimate map of the city's best swirls",
@@ -19,6 +27,7 @@ export default function RootLayout({
     <html lang="en" className={`h-full ${inter.variable}`}>
       <body className="h-full flex flex-col font-[var(--font-inter)] antialiased">
         {children}
+        <MobileFooter />
         <Footer />
       </body>
     </html>

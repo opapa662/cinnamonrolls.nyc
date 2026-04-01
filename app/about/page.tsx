@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Header from "@/components/Header";
 import AboutClient from "./AboutClient";
 import { supabase } from "@/lib/supabase";
@@ -19,17 +20,17 @@ export default async function AboutPage() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icon.png" alt="" style={{ width: 48, height: 48, objectFit: "contain", display: "block", marginBottom: 20 }} />
             <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--cr-brown-dark)", letterSpacing: "-0.02em", marginBottom: 16, lineHeight: 1.2 }}>
-              About cinnamonrolls.nyc
+              Welcome!
             </h1>
             <div style={{ display: "flex", flexDirection: "column", gap: 14, fontSize: 15, color: "#7A4010", lineHeight: 1.7 }}>
               <p style={{ margin: 0 }}>
-                This map started as a personal obsession. NYC has an incredible cinnamon roll scene — from classic bakeries to tiny pop-ups — but finding the good ones meant digging through articles, scrolling Instagram, and asking friends. There was no single place to see it all.
+                NYC has a budding cinnamon roll scene - from classic bakeries to park kiosks to pop-ups - but there was no single map where you could see them all. So we built one!
               </p>
               <p style={{ margin: 0 }}>
-                So we built one. cinnamonrolls.nyc is an independent, curated map of the city&apos;s best swirls. Every spot is hand-picked — no algorithms, no ads, no sponsored listings. Just rolls worth eating.
+                cinnamonrolls.nyc is an independent, curated map of the city&apos;s best swirls – and a love letter to our favorite pastry. Whether you&apos;re a fellow cinnamon roll obsessive or just craving something sweet, we hope this map helps you find it.
               </p>
               <p style={{ margin: 0 }}>
-                Know a spot we&apos;re missing? Something out of date? We want to hear from you.
+                We&apos;re always adding new spots - we know there are more to be discovered. Know a place we&apos;re missing? Something out of date? We&apos;d love to hear about it.
               </p>
             </div>
           </div>
@@ -38,12 +39,25 @@ export default async function AboutPage() {
           <div style={{ borderTop: "1px solid rgba(139,69,19,0.15)", marginBottom: 40 }} />
 
           {/* Contact form */}
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--cr-brown-dark)", letterSpacing: "-0.01em", marginBottom: 6 }}>
-            Get in touch
-          </h2>
-          <p style={{ fontSize: 14, color: "#9C6B3C", marginBottom: 28, lineHeight: 1.6 }}>
-            Feedback, suggestions, or just want to say hi — we read everything.
-          </p>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 28 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--cr-brown-dark)", letterSpacing: "-0.01em", margin: 0 }}>
+              Get in touch
+            </h2>
+            <Link href="/submit" style={{
+              display: "inline-block",
+              padding: "9px 16px",
+              background: "#fff8ed",
+              border: "1px solid rgba(139,69,19,0.25)",
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              color: "var(--cr-brown)",
+              textDecoration: "none",
+              letterSpacing: "0.01em",
+            }}>
+              Request an addition or edit to the map →
+            </Link>
+          </div>
           <AboutClient />
         </div>
       </div>

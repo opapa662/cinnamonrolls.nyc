@@ -45,20 +45,26 @@ function formatOpenDays(weekdayText: string[]): string | null {
 }
 
 function ensurePopupVisible(popup: import("mapbox-gl").Popup, map: MapboxMap) {
-  requestAnimationFrame(() => {
+  // Use setTimeout so the popup is fully rendered and sized before we measure.
+  setTimeout(() => {
     const popupEl = popup.getElement();
-    if (!popupEl) return;
+    if (!popupEl || !popup.isOpen()) return;
     const rect = popupEl.getBoundingClientRect();
-    const mapRect = map.getContainer().getBoundingClientRect();
-    const margin = 16;
+    const isMobile = window.innerWidth < 768;
+    const margin = 12;
+    // Safe zone: below header (68px), above collapsed tray+action bar (116px) on mobile
+    const safeTop    = 68 + margin;
+    const safeBottom = isMobile ? window.innerHeight - 116 - margin : window.innerHeight - margin;
+    const safeLeft   = margin;
+    const safeRight  = window.innerWidth - margin;
     let panX = 0;
     let panY = 0;
-    if (rect.bottom > mapRect.bottom - margin) panY = rect.bottom - (mapRect.bottom - margin);
-    else if (rect.top < mapRect.top + margin) panY = rect.top - (mapRect.top + margin);
-    if (rect.right > mapRect.right - margin) panX = rect.right - (mapRect.right - margin);
-    else if (rect.left < mapRect.left + margin) panX = rect.left - (mapRect.left + margin);
-    if (panX !== 0 || panY !== 0) map.panBy([panX, panY], { duration: 250 });
-  });
+    if (rect.bottom > safeBottom) panY = rect.bottom - safeBottom;
+    else if (rect.top < safeTop)  panY = rect.top - safeTop;
+    if (rect.right > safeRight)   panX = rect.right - safeRight;
+    else if (rect.left < safeLeft) panX = rect.left - safeLeft;
+    if (panX !== 0 || panY !== 0) map.panBy([panX, panY], { duration: 200 });
+  }, 80);
 }
 
 function createPinElement(): HTMLElement {

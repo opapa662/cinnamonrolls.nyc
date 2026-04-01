@@ -90,7 +90,8 @@ Single-page Next.js app. On load, the app fetches all locations from Supabase vi
 | longitude | float | GPS longitude |
 | neighborhood | text | Neighborhood name (e.g., "Park Slope", "East Village") |
 | borough | text | NYC borough (e.g., "Brooklyn", "Manhattan") |
-| source | text | Where we learned about this spot (e.g., "The Infatuation", "The Carboholic") — shown as "Featured by" tags on popup |
+| source | text | Internal only — where we originally discovered this spot. Never displayed to users. |
+| mentions | text[] | Publications/media/influencers that have featured this spot (e.g., ["The Infatuation", "Time Out NY"]). Drives "Featured by" tags on popup card. Keep to established outlets only — no TikTok/social handles. |
 | notes | text | Displayed on popup card (e.g., "Saturdays only", "Inside Prospect Park Picnic House") |
 | location_type | text | Sentence case: Bakery, Café, Kiosk, Market, Pop-up, Restaurant |
 | website | text | Full URL — shown as link on popup card |
@@ -103,7 +104,7 @@ Single-page Next.js app. On load, the app fetches all locations from Supabase vi
 | created_at | timestamp | Auto-generated |
 | updated_at | timestamp | Auto-generated |
 
-_Multi-location bakeries:_ Each physical location is a separate row. Use `display_name` to distinguish them (e.g., "Winner — Windsor Terrace" and "Winner — Prospect Heights"). Single-location bakeries can leave `display_name` null and the popup will use `name`.
+_Multi-location bakeries:_ Each physical location is a separate row. Use `display_name` to distinguish them (e.g., "Winner - Windsor Terrace" and "Winner - Prospect Heights"). Single-location bakeries can leave `display_name` null and the popup will use `name`. **Always use a hyphen** (`-`) as the separator — never an em dash (`—`).
 
 ---
 

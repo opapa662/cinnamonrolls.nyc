@@ -3,7 +3,7 @@
 ## Current State
 
 **Last updated:** 2026-03-31
-**Last session summary:** Major post-MVP sprint. Google Places enrichment, redesigned popup cards, sidebar/footer polish, domain live, about page + contact form.
+**Last session summary:** Major post-MVP sprint. Google Places enrichment, redesigned popup cards, sidebar/footer polish, domain live, about page + contact form. Mobile design work starting next.
 
 **Done:**
 - Next.js 16 project scaffolded (App Router, TypeScript, Tailwind CSS 4, Turbopack)
@@ -19,7 +19,7 @@
 - **Popup card redesign** (2026-03-31): neighborhood/borough header, large name, type + rating + open days meta row, notes, "Featured by" tags, website + Instagram links
 - **Google Places enrichment** (2026-03-31): `google_place_id`, `google_rating`, `google_hours` added to all 41 locations via coordinate-based nearby search (correct branch matching). Rating links to Google Maps, always shows 1 decimal.
 - `location_type` values updated to Sentence case (Bakery, Café, Kiosk, Market, Pop-up, Restaurant)
-- Fixed footer bar (`#f5e6d3`) with Instagram handle + "About us" link — present on all pages
+- Fixed footer bar (`#f5e6d3`) with Instagram handle + "About" link — present on all pages
 - Header logo/name links to homepage on all pages
 - `/submit` page: Add a new spot + Suggest an edit forms (edit form streamlined — no redundant fields)
 - `/about` page: brand story + contact form (name optional, email + message required) → `contact_submissions` table
@@ -27,15 +27,88 @@
 - Page title + tagline: "cinnamonrolls.nyc - the ultimate map of the city's best swirls"
 - Inter font consistent across all pages including popup cards
 - Map style: `light-v11`
+- `<title>` tag set
+- HTTPS + SSL auto-provisioned via Vercel
+- `/about` contact form wired to `contact_submissions` table
 
-**In progress:** Nothing
+**In progress:** Mobile design
 
 **Blockers:** None
 
-**Next steps (post-MVP P1):**
-- ~~Borough/neighborhood filtering~~ ✓ done
-- ~~Enrich popup cards~~ ✓ done (rating, hours, source tags, links)
-- SEO pages: individual spot pages, neighborhood pages
+---
+
+## Pre-Launch Checklist
+
+### QA & Data
+- [ ] QA all locations — spot-check addresses on Google Maps, confirm still open
+- [ ] Confirm multi-location businesses have correct + distinct neighborhood tags (Ole & Steen x4, Petee's x2, Bakeri x2, etc.)
+- [ ] Fix any inaccurate neighborhood labels (e.g. "Winner in the Park" → "Prospect Park · Brooklyn")
+- [ ] Test all buttons and interactive elements (Nearby, Search, Saved, Add or Edit, Surprise Me)
+- [ ] Test "Surprise Me" — confirm it feels intentional and delightful
+- [ ] Test "Add or Edit" flow end to end — confirm submissions route somewhere reviewable
+- [ ] Test contact form on /about — send a test submission and confirm it arrives
+- [ ] Test map interaction — clicking a list item highlights on map and vice versa
+- [ ] Test "Nearby" — confirm geolocation permission prompt and graceful fallback if denied
+- [ ] Test empty/error states (no results, location denied, slow connection)
+
+### Mobile & Desktop
+- [ ] **Mobile design + layout** (in progress)
+- [ ] Test mobile layout and functionality (iOS Safari + Chrome)
+- [ ] Test desktop layout (Chrome, Safari, Firefox)
+- [ ] Test Safari specifically — map rendering and geolocation behave differently
+- [ ] Test on slow connection — confirm map and locations don't hang
+
+### Security
+- [ ] Restrict API keys by domain (Google Maps, Mapbox) so they can't be reused elsewhere
+- [ ] Add spam protection to contact form (honeypot field or rate limiting)
+- [ ] Review CORS and Content Security Policy headers
+
+### SEO & Social
+- [ ] Add `<meta description>`
+- [ ] Add Open Graph tags (og:title, og:description, og:image) for social sharing previews
+- [ ] Add Twitter Card meta tags
+- [ ] Confirm canonical URL — www vs non-www should redirect to one
+- [ ] Add robots.txt
+- [ ] Add sitemap.xml
+- [ ] Test social share preview — send link via iMessage, Instagram DMs, check the card
+- [ ] Confirm favicon shows in browser tabs
+- [ ] Confirm @cinnamonrolls.nyc Instagram links back to site
+
+### Infrastructure
+- [ ] Set up analytics (Plausible or Fathom — privacy-friendly)
+- [ ] Add a custom 404 page that links back to the map
+- [ ] Confirm www.cinnamonrolls.nyc and cinnamonrolls.nyc both resolve correctly
+
+### Launch Prep
+- [ ] Prepare Instagram launch post
+- [ ] Draft list of NYC food bloggers / accounts to DM at launch
+
+---
+
+## Post-Launch
+
+### Features
+- [ ] Individual spot pages (SEO — `/spots/[slug]`)
+- [ ] Neighborhood pages (SEO — `/neighborhoods/[slug]`)
+- [ ] Share functionality (share a specific spot or full map, like pooltables.nyc)
+- [ ] "Available today" tags for spots with limited cinnamon roll days (Red Gate, KYU, Mah-Ze-Dahr, etc.)
+- [ ] Add location address to popup / spot page
+- [ ] Bakery photos (or confirm uniform icon feels intentional)
+- [ ] Add a simple privacy note about email collection from contact form
+- [ ] Add cookie notice if analytics uses cookies
+- [ ] Ole & Steen Tribeca (no confirmed address yet — hold)
+- [ ] Apt. 2 Bread (pop-up only, no fixed address — hold)
+
+### Accessibility
+- [ ] Keyboard navigation — confirm tab order through location list
+- [ ] Check color contrast ratios
+- [ ] Add alt text to all images
+- [ ] Screen reader testing
+
+### Technical
+- [ ] Add JSON-LD structured data (LocalBusiness / FoodEstablishment) per location
+- [ ] Add error monitoring (Sentry or similar)
+- [ ] Set up caching / CDN for map tiles and location data
 
 ---
 
@@ -66,3 +139,4 @@
 - **Font: Inter throughout** — including popup cards. No display font for now; Inter at various weights carries the brand well.
 - **location_type in Sentence case** (Bakery, Café, etc.) — was lowercase snake_case in DB, updated after dropping check constraint.
 - **Submit page edit form** — name, website, address fields hidden in "Suggest an edit" mode since the user already selected the location from a dropdown.
+- **`mentions` vs `source`** — `mentions` (string[]) drives "Featured by" tags on the popup card. `source` (text) is internal-only and never displayed. Never wire `source` to UI.

@@ -25,14 +25,14 @@ export default function Header({ count, backLink }: { count: number; backLink?: 
           <div className="header-title" style={{ fontWeight: 600, color: "var(--cr-cream)", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
             cinnamonrolls.nyc
           </div>
-          <div className="header-tagline" style={{ fontWeight: 400, color: "#d4904a", letterSpacing: "0.01em", lineHeight: 1.2, marginTop: 2 }}>
+          <div className="header-tagline" style={{ fontWeight: 400, color: "rgba(255,248,240,0.72)", letterSpacing: "0.01em", lineHeight: 1.2, marginTop: 2 }}>
             the ultimate map of the city&apos;s best swirls
           </div>
         </div>
       </Link>
       <div style={{ display: "flex", alignItems: "center", gap: 24, fontFamily: "var(--font-inter), -apple-system, sans-serif" }}>
         {backLink && (
-          <Link href="/" className="back-to-map" style={{ fontSize: "13px", color: "#d4904a", textDecoration: "none", fontWeight: 500 }}>
+          <Link href="/" className="back-to-map" style={{ fontSize: "13px", color: "rgba(255,248,240,0.72)", textDecoration: "none", fontWeight: 500 }}>
             ← Back to map
           </Link>
         )}
@@ -40,7 +40,7 @@ export default function Header({ count, backLink }: { count: number; backLink?: 
           <div className="header-count" style={{ fontWeight: 600, color: "var(--cr-cream)", letterSpacing: "-0.01em", lineHeight: 1.2, whiteSpace: "nowrap" }}>
             {count} cinnamon rolls
           </div>
-          <div className="header-sub" style={{ color: "#d4904a", marginTop: 2, lineHeight: 1.2, whiteSpace: "nowrap" }}>
+          <div className="header-sub" style={{ color: "rgba(255,248,240,0.72)", marginTop: 2, lineHeight: 1.2, whiteSpace: "nowrap" }}>
             Updated today
           </div>
         </div>

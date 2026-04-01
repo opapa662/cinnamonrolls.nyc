@@ -60,6 +60,7 @@ async function main() {
     .from("locations")
     .select("id, name, display_name, latitude, longitude, google_place_id")
     .eq("status", "active")
+    .is("google_place_id", null)
     .order("name");
 
   if (error || !locations) {
