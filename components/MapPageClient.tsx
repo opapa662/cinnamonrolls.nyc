@@ -329,8 +329,12 @@ export default function MapPageClient({ locations }: MapPageClientProps) {
           onSearchOpen={() => {
             const opening = !searchOpen;
             setSearchOpen((o) => !o);
-            if (opening) mobileSheetRef.current?.collapse();
-            else mobileSheetRef.current?.peek();
+            if (opening) {
+              setSavedMode(false);
+              mobileSheetRef.current?.collapse();
+            } else {
+              mobileSheetRef.current?.peek();
+            }
           }}
           onSurpriseMe={handleSurpriseMe}
           onToggleSavedMode={toggleSavedMode}
