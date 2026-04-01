@@ -44,6 +44,23 @@ function formatOpenDays(weekdayText: string[]): string | null {
   return openDays.map((d) => DAY_SHORT[d]).join(", ");
 }
 
+function ensurePopupVisible(popup: import("mapbox-gl").Popup, map: MapboxMap) {
+  requestAnimationFrame(() => {
+    const popupEl = popup.getElement();
+    if (!popupEl) return;
+    const rect = popupEl.getBoundingClientRect();
+    const mapRect = map.getContainer().getBoundingClientRect();
+    const margin = 16;
+    let panX = 0;
+    let panY = 0;
+    if (rect.bottom > mapRect.bottom - margin) panY = rect.bottom - (mapRect.bottom - margin);
+    else if (rect.top < mapRect.top + margin) panY = rect.top - (mapRect.top + margin);
+    if (rect.right > mapRect.right - margin) panX = rect.right - (mapRect.right - margin);
+    else if (rect.left < mapRect.left + margin) panX = rect.left - (mapRect.left + margin);
+    if (panX !== 0 || panY !== 0) map.panBy([panX, panY], { duration: 250 });
+  });
+}
+
 function createPinElement(): HTMLElement {
   const el = document.createElement("div");
   el.style.cssText =
@@ -195,11 +212,21 @@ export default function Map({ locations, onMapReady, onPinClick, savedIds, onTog
 
           el.addEventListener("click", () => {
             onPinClick?.(loc.id);
-            map.flyTo({ center: [loc.longitude, loc.latitude], zoom: 14, duration: 600 });
+            const isMobile = window.innerWidth < 768;
+            // Position pin in upper area so popup card has room below
+            map.flyTo({
+              center: [loc.longitude, loc.latitude],
+              zoom: 14,
+              padding: isMobile
+                ? { top: 60, bottom: 320, left: 40, right: 40 }
+                : { top: 80, bottom: 380, left: 60, right: 60 },
+              duration: 600,
+            });
             setTimeout(() => {
               popupsRef.current.forEach((p) => { if (p.isOpen()) p.remove(); });
               popup.setHTML(createPopupHTML(loc, savedIdsRef.current.has(loc.id)));
               popup.setLngLat([loc.longitude, loc.latitude]).addTo(map);
+              ensurePopupVisible(popup, map);
             }, 650);
           });
 
@@ -228,6 +255,7 @@ export default function Map({ locations, onMapReady, onPinClick, savedIds, onTog
           if (popup && marker) {
             if (loc) popup.setHTML(createPopupHTML(loc, savedIdsRef.current.has(id)));
             popup.setLngLat(marker.getLngLat()).addTo(map);
+            ensurePopupVisible(popup, map);
           }
         };
 
