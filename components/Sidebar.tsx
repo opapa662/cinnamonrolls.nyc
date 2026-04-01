@@ -32,6 +32,8 @@ interface SidebarProps {
   nearbyRadius: number | null;
   nearbyError: string | null;
   onNearbyClick: () => void;
+  onNearbyRefresh: () => void;
+  onClearAll: () => void;
   distances: globalThis.Map<string, number> | null;
 }
 
@@ -217,6 +219,8 @@ export default function Sidebar({
   nearbyRadius,
   nearbyError,
   onNearbyClick,
+  onNearbyRefresh,
+  onClearAll,
   distances,
 }: SidebarProps) {
   const router = useRouter();
@@ -326,6 +330,14 @@ export default function Sidebar({
               : "All Locations"}
           </span>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {nearbyMode && (
+              <button
+                onClick={onNearbyRefresh}
+                style={{ fontSize: 11, color: "#9C6B3C", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "inherit" }}
+              >
+                Refresh ↻
+              </button>
+            )}
             {(nearbyMode || savedMode) && (
               <button
                 onClick={nearbyMode ? onNearbyClick : onToggleSavedMode}
@@ -334,15 +346,18 @@ export default function Sidebar({
                 Close ×
               </button>
             )}
-            {nearbyMode && filteredLocations.length > 0 && (
+            {!nearbyMode && !savedMode && (
               <span style={{ fontSize: 11, color: "#b08060", fontWeight: 500 }}>
-                {nearbyRadius != null ? `within ${nearbyRadius} mi` : `${filteredLocations.length} closest`}
+                {`${filteredLocations.length} of ${locations.length}`}
               </span>
             )}
-            {!nearbyMode && (!savedMode || filteredLocations.length > 0) && (
-              <span style={{ fontSize: 11, color: "#b08060", fontWeight: 500 }}>
-                {savedMode ? filteredLocations.length : `${filteredLocations.length} of ${locations.length}`}
-              </span>
+            {isFiltered && !nearbyMode && !savedMode && (
+              <button
+                onClick={onClearAll}
+                style={{ fontSize: 11, color: "#9C6B3C", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "inherit" }}
+              >
+                Show all ×
+              </button>
             )}
           </div>
         </div>

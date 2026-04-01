@@ -28,6 +28,7 @@ interface Props {
   nearbyRadius: number | null;
   nearbyError: string | null;
   onNearbyClick: () => void;
+  onNearbyRefresh: () => void;
   distances: globalThis.Map<string, number> | null;
   selectedId: string | null;
 }
@@ -42,7 +43,7 @@ const MobileBottomSheet = forwardRef<MobileSheetHandle, Props>(function MobileBo
   {
     locations, filteredLocations, isFiltered, onSelectLocation, onClearAll, savedIds,
     onToggleSave, savedMode, onToggleSavedMode, nearbyMode, nearbyRadius,
-    nearbyError, onNearbyClick, distances, selectedId,
+    nearbyError, onNearbyClick, onNearbyRefresh, distances, selectedId,
   },
   ref,
 ) {
@@ -235,6 +236,14 @@ const MobileBottomSheet = forwardRef<MobileSheetHandle, Props>(function MobileBo
               : "All Locations"}
           </span>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {nearbyMode && (
+              <button
+                onClick={onNearbyRefresh}
+                style={{ fontSize: 11, color: "#9C6B3C", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "inherit" }}
+              >
+                Refresh ↻
+              </button>
+            )}
             {(nearbyMode || savedMode) && (
               <button
                 onClick={nearbyMode ? onNearbyClick : onToggleSavedMode}
@@ -243,14 +252,9 @@ const MobileBottomSheet = forwardRef<MobileSheetHandle, Props>(function MobileBo
                 Close ×
               </button>
             )}
-            {nearbyMode && filteredLocations.length > 0 && (
+            {!nearbyMode && !savedMode && (
               <span style={{ fontSize: 11, color: "#b08060", fontWeight: 500 }}>
-                {nearbyRadius != null ? `within ${nearbyRadius} mi` : `${filteredLocations.length} closest`}
-              </span>
-            )}
-            {!nearbyMode && (!savedMode || filteredLocations.length > 0) && (
-              <span style={{ fontSize: 11, color: "#b08060", fontWeight: 500 }}>
-                {savedMode ? filteredLocations.length : `${filteredLocations.length} of ${locations.length}`}
+                {`${filteredLocations.length} of ${locations.length}`}
               </span>
             )}
             {isFiltered && !nearbyMode && !savedMode && (

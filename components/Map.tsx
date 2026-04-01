@@ -213,14 +213,11 @@ export default function Map({ locations, onMapReady, onPinClick, savedIds, onTog
           el.addEventListener("click", () => {
             onPinClick?.(loc.id);
             const isMobile = window.innerWidth < 768;
-            // Position pin in upper area so popup card has room below
             map.flyTo({
               center: [loc.longitude, loc.latitude],
               zoom: 14,
-              padding: isMobile
-                ? { top: 60, bottom: 320, left: 40, right: 40 }
-                : { top: 80, bottom: 380, left: 60, right: 60 },
               duration: 600,
+              offset: isMobile ? [0, 110] : [0, -100],
             });
             setTimeout(() => {
               popupsRef.current.forEach((p) => { if (p.isOpen()) p.remove(); });
