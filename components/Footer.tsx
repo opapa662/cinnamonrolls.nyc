@@ -3,6 +3,7 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <footer
+      className="desktop-footer"
       style={{
         position: "fixed",
         bottom: 0,
@@ -28,11 +29,12 @@ export default function Footer() {
       >
         @cinnamonrolls.nyc
       </a>
+      <span style={{ fontSize: "12px", color: "rgba(139,69,19,0.3)" }}>|</span>
       <Link
         href="/about"
         style={{ fontSize: "12px", fontWeight: 500, color: "#9C6B3C", textDecoration: "none" }}
       >
-        About us
+        About
       </Link>
     </footer>
   );
