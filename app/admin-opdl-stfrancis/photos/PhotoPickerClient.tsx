@@ -54,7 +54,10 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
         }));
       } else {
         const data = await res.json().catch(() => ({}));
-        alert(`Error refreshing photos: ${data.error ?? res.status}`);
+        // Silently skip spots with no google_place_id (e.g. pop-ups)
+        if (data.error !== "Location has no google_place_id") {
+          alert(`Error refreshing photos: ${data.error ?? res.status}`);
+        }
       }
     } catch {
       alert("Network error refreshing photos");
@@ -96,7 +99,7 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
   }
 
   async function refreshAll() {
-    const targets = filtered;
+    const targets = filtered.filter((l) => l.google_place_id);
     setRefreshAllProgress({ current: 0, total: targets.length });
     for (let i = 0; i < targets.length; i++) {
       setRefreshAllProgress({ current: i + 1, total: targets.length });
