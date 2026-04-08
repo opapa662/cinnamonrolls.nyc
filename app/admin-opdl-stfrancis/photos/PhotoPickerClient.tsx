@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 interface LocationWithPhotos {
   id: string;
@@ -25,7 +25,9 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
   const [locationStates, setLocationStates] = useState<Record<string, LocationState>>({});
   const [loadingRefresh, setLoadingRefresh] = useState<Record<string, boolean>>({});
   const [loadingSelect, setLoadingSelect] = useState<Record<string, boolean>>({});
+  const [loadingUpload, setLoadingUpload] = useState<Record<string, boolean>>({});
   const [refreshAllProgress, setRefreshAllProgress] = useState<{ current: number; total: number } | null>(null);
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   function getState(loc: LocationWithPhotos): LocationState {
     return locationStates[loc.id] ?? {
@@ -54,7 +56,6 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
         }));
       } else {
         const data = await res.json().catch(() => ({}));
-        // Silently skip spots with no google_place_id (e.g. pop-ups)
         if (data.error !== "Location has no google_place_id") {
           alert(`Error refreshing photos: ${data.error ?? res.status}`);
         }
@@ -65,12 +66,12 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
     setLoadingRefresh((p) => ({ ...p, [id]: false }));
   }
 
-  async function selectPhoto(loc: LocationWithPhotos, url: string) {
+  async function selectPhoto(loc: LocationWithPhotos, url: string, source: "google" | "own") {
     const current = getState(loc);
     const isSelected = current.photo_url === url;
     const body = isSelected
       ? { photo_url: null, photo_source: null, photo_attribution: null }
-      : { photo_url: url, photo_source: "google", photo_attribution: "Google Maps" };
+      : { photo_url: url, photo_source: source, photo_attribution: source === "google" ? "Google Maps" : null };
 
     setLoadingSelect((p) => ({ ...p, [loc.id]: true }));
     try {
@@ -85,7 +86,7 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
           [loc.id]: {
             ...(p[loc.id] ?? { google_photos: loc.google_photos }),
             photo_url: isSelected ? null : url,
-            photo_source: isSelected ? null : "google",
+            photo_source: isSelected ? null : source,
           } as LocationState,
         }));
       } else {
@@ -98,15 +99,42 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
     setLoadingSelect((p) => ({ ...p, [loc.id]: false }));
   }
 
+  async function uploadPhoto(loc: LocationWithPhotos, file: File) {
+    setLoadingUpload((p) => ({ ...p, [loc.id]: true }));
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`/api/admin-opdl-stfrancis/photos/upload/${loc.id}`, {
+        method: "POST",
+        body: formData,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setLocationStates((p) => ({
+          ...p,
+          [loc.id]: {
+            ...(p[loc.id] ?? { google_photos: loc.google_photos }),
+            photo_url: data.photo_url,
+            photo_source: "own",
+          } as LocationState,
+        }));
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(`Upload failed: ${data.error ?? res.status}`);
+      }
+    } catch {
+      alert("Network error uploading photo");
+    }
+    setLoadingUpload((p) => ({ ...p, [loc.id]: false }));
+  }
+
   async function refreshAll() {
     const targets = filtered.filter((l) => l.google_place_id);
     setRefreshAllProgress({ current: 0, total: targets.length });
     for (let i = 0; i < targets.length; i++) {
       setRefreshAllProgress({ current: i + 1, total: targets.length });
       await refreshPhotos(targets[i].id);
-      if (i < targets.length - 1) {
-        await new Promise((r) => setTimeout(r, 300));
-      }
+      if (i < targets.length - 1) await new Promise((r) => setTimeout(r, 300));
     }
     setRefreshAllProgress(null);
   }
@@ -128,9 +156,7 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
             disabled={refreshAllProgress !== null}
             style={{ padding: "6px 14px", fontSize: 12, fontWeight: 600, background: refreshAllProgress ? "rgba(139,69,19,0.1)" : "var(--cr-brown)", color: refreshAllProgress ? "var(--cr-brown-mid)" : "#fff", border: "none", borderRadius: 6, cursor: refreshAllProgress ? "not-allowed" : "pointer", fontFamily: "inherit" }}
           >
-            {refreshAllProgress
-              ? `Refreshing ${refreshAllProgress.current}/${refreshAllProgress.total}…`
-              : "Refresh all"}
+            {refreshAllProgress ? `Refreshing ${refreshAllProgress.current}/${refreshAllProgress.total}…` : "Refresh all"}
           </button>
         </div>
       </header>
@@ -144,11 +170,7 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             {(["all", "needs_photo"] as const).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                style={{ padding: "5px 14px", fontSize: 12, fontWeight: 600, borderRadius: 20, border: "1.5px solid", cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s", borderColor: filter === f ? "var(--cr-brown)" : "rgba(139,69,19,0.2)", background: filter === f ? "var(--cr-brown)" : "#fff", color: filter === f ? "#fff" : "var(--cr-brown-mid)" }}
-              >
+              <button key={f} onClick={() => setFilter(f)} style={{ padding: "5px 14px", fontSize: 12, fontWeight: 600, borderRadius: 20, border: "1.5px solid", cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s", borderColor: filter === f ? "var(--cr-brown)" : "rgba(139,69,19,0.2)", background: filter === f ? "var(--cr-brown)" : "#fff", color: filter === f ? "#fff" : "var(--cr-brown-mid)" }}>
                 {f === "all" ? "All" : "Needs photo"}
               </button>
             ))}
@@ -160,26 +182,32 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
           {filtered.map((loc) => {
             const state = getState(loc);
             const isRefreshing = loadingRefresh[loc.id];
+            const isUploading = loadingUpload[loc.id];
             const isSelecting = loadingSelect[loc.id];
-            const isLoading = isRefreshing || isSelecting;
-            const photos = state.google_photos;
-            const hasPhotos = photos && photos.length > 0;
+            const isLoading = isRefreshing || isSelecting || isUploading;
+            const googlePhotos = state.google_photos ?? [];
+            const ownPhoto = state.photo_source === "own" ? state.photo_url : null;
+
+            // Own photo shown first if it exists and isn't also in google_photos
+            const allPhotos: { url: string; source: "google" | "own" }[] = [
+              ...(ownPhoto ? [{ url: ownPhoto, source: "own" as const }] : []),
+              ...googlePhotos
+                .filter((u) => u !== ownPhoto)
+                .map((u) => ({ url: u, source: "google" as const })),
+            ];
 
             return (
-              <div
-                key={loc.id}
-                style={{ background: "#fff", borderRadius: 12, padding: 16, border: "1px solid rgba(139,69,19,0.1)", opacity: isLoading ? 0.7 : 1, transition: "opacity 0.15s" }}
-              >
+              <div key={loc.id} style={{ background: "#fff", borderRadius: 12, padding: 16, border: "1px solid rgba(139,69,19,0.1)", opacity: isLoading ? 0.7 : 1, transition: "opacity 0.15s" }}>
                 {/* Top row */}
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: hasPhotos ? 12 : 0 }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: allPhotos.length > 0 ? 12 : 8 }}>
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: "var(--cr-brown-dark)" }}>
                         {loc.display_name || loc.name}
                       </div>
                       {state.photo_url && (
-                        <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 20, background: "#f0fdf4", color: "#15803d" }}>
-                          Photo set ✓
+                        <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 20, background: state.photo_source === "own" ? "#eff6ff" : "#f0fdf4", color: state.photo_source === "own" ? "#1d4ed8" : "#15803d" }}>
+                          {state.photo_source === "own" ? "Your photo ✓" : "Photo set ✓"}
                         </span>
                       )}
                     </div>
@@ -189,39 +217,63 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
                       </div>
                     )}
                   </div>
-                  <button
-                    onClick={() => refreshPhotos(loc.id)}
-                    disabled={isLoading || !loc.google_place_id}
-                    title={!loc.google_place_id ? "No google_place_id set" : undefined}
-                    style={{ flexShrink: 0, padding: "5px 12px", fontSize: 11, fontWeight: 600, background: "#fff", color: "var(--cr-brown)", border: "1.5px solid rgba(139,69,19,0.3)", borderRadius: 6, cursor: isLoading || !loc.google_place_id ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: !loc.google_place_id ? 0.4 : 1 }}
-                  >
-                    {isRefreshing ? "Refreshing…" : "Refresh from Google"}
-                  </button>
+                  <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                    {/* Upload button */}
+                    <button
+                      onClick={() => fileInputRefs.current[loc.id]?.click()}
+                      disabled={isLoading}
+                      style={{ padding: "5px 12px", fontSize: 11, fontWeight: 600, background: "#fff", color: "#1d4ed8", border: "1.5px solid rgba(29,78,216,0.3)", borderRadius: 6, cursor: isLoading ? "not-allowed" : "pointer", fontFamily: "inherit" }}
+                    >
+                      {isUploading ? "Uploading…" : "↑ Upload"}
+                    </button>
+                    <input
+                      ref={(el) => { fileInputRefs.current[loc.id] = el; }}
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) uploadPhoto(loc, file);
+                        e.target.value = "";
+                      }}
+                    />
+                    {/* Refresh button */}
+                    <button
+                      onClick={() => refreshPhotos(loc.id)}
+                      disabled={isLoading || !loc.google_place_id}
+                      title={!loc.google_place_id ? "No Google ID" : undefined}
+                      style={{ padding: "5px 12px", fontSize: 11, fontWeight: 600, background: "#fff", color: "var(--cr-brown)", border: "1.5px solid rgba(139,69,19,0.3)", borderRadius: 6, cursor: isLoading || !loc.google_place_id ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: !loc.google_place_id ? 0.4 : 1 }}
+                    >
+                      {isRefreshing ? "Refreshing…" : "Refresh from Google"}
+                    </button>
+                  </div>
                 </div>
 
-                {/* Photos area */}
-                {!hasPhotos ? (
-                  <div style={{ fontSize: 12, color: "var(--cr-brown-mid)", fontStyle: "italic", marginTop: 8 }}>
-                    {!loc.google_place_id ? "No Google ID" : "No Google photos fetched yet — click Refresh"}
+                {/* Photos */}
+                {allPhotos.length === 0 ? (
+                  <div style={{ fontSize: 12, color: "var(--cr-brown-mid)", fontStyle: "italic" }}>
+                    {!loc.google_place_id ? "No Google ID — upload your own photo" : "No Google photos fetched yet — click Refresh or upload your own"}
                   </div>
                 ) : (
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                    {photos.map((url, i) => {
+                    {allPhotos.map(({ url, source }, i) => {
                       const isSelected = state.photo_url === url;
                       return (
                         <div
                           key={i}
-                          onClick={() => !isLoading && selectPhoto(loc, url)}
+                          onClick={() => !isLoading && selectPhoto(loc, url, source)}
                           style={{ position: "relative", cursor: isLoading ? "not-allowed" : "pointer", borderRadius: 6, overflow: "hidden", border: isSelected ? "2.5px solid #d4904a" : "2.5px solid transparent", transition: "border-color 0.15s", flexShrink: 0 }}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={url}
-                            alt={`Photo ${i + 1}`}
-                            style={{ width: 140, height: 95, objectFit: "cover", display: "block" }}
-                          />
+                          <img src={url} alt={`Photo ${i + 1}`} style={{ width: 140, height: 95, objectFit: "cover", display: "block" }} />
+                          {/* Source badge */}
+                          {source === "own" && (
+                            <div style={{ position: "absolute", bottom: 4, left: 4, fontSize: 9, fontWeight: 700, padding: "2px 5px", borderRadius: 4, background: "rgba(29,78,216,0.85)", color: "#fff", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                              Yours
+                            </div>
+                          )}
                           {isSelected && (
-                            <div style={{ position: "absolute", top: 4, right: 4, width: 20, height: 20, borderRadius: "50%", background: "#d4904a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", fontWeight: 700, lineHeight: 1 }}>
+                            <div style={{ position: "absolute", top: 4, right: 4, width: 20, height: 20, borderRadius: "50%", background: "#d4904a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", fontWeight: 700 }}>
                               ✓
                             </div>
                           )}
@@ -237,7 +289,7 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
 
         {filtered.length === 0 && (
           <div style={{ textAlign: "center", padding: "40px 0", color: "var(--cr-brown-mid)", fontSize: 14 }}>
-            {filter === "needs_photo" ? "All locations have a photo set" : "No locations found"}
+            {filter === "needs_photo" ? "All locations have a photo set 🎉" : "No locations found"}
           </div>
         )}
       </div>

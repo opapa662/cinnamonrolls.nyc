@@ -23,7 +23,7 @@ const securityHeaders = [
       // Mapbox and Next.js use inline styles
       "style-src 'self' 'unsafe-inline'",
       // Map tiles, data URIs, blobs, GA4 beacon
-      "img-src 'self' data: blob: https://*.mapbox.com https://www.google-analytics.com https://lh3.googleusercontent.com https://maps.googleapis.com",
+      "img-src 'self' data: blob: https://*.mapbox.com https://www.google-analytics.com https://lh3.googleusercontent.com https://maps.googleapis.com https://*.supabase.co",
       // Mapbox tiles/API/WebSockets + Supabase + GA4/GTM
       "connect-src 'self' https://*.mapbox.com wss://*.mapbox.com https://events.mapbox.com https://www.mapbox.com https://*.supabase.co blob: https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com",
       // Mapbox web workers run as blob URLs
