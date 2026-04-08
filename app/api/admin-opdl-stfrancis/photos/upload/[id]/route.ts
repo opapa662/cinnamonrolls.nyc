@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import sharp from "sharp";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (req.cookies.get("cr_admin")?.value !== process.env.ADMIN_TOKEN) {
@@ -11,13 +12,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const file = formData.get("file") as File | null;
   if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
 
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-  const filename = `${id}-${Date.now()}.${ext}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
+  const raw = Buffer.from(await file.arrayBuffer());
+
+  // Convert everything to JPEG — handles HEIC, PNG, WebP, TIFF, etc.
+  const converted = await sharp(raw).rotate().jpeg({ quality: 90 }).toBuffer();
+
+  const filename = `${id}-${Date.now()}.jpg`;
 
   const { error: uploadError } = await supabaseAdmin.storage
     .from("location-photos")
-    .upload(filename, buffer, { contentType: file.type, upsert: true });
+    .upload(filename, converted, { contentType: "image/jpeg", upsert: true });
 
   if (uploadError) return NextResponse.json({ error: uploadError.message }, { status: 500 });
 
