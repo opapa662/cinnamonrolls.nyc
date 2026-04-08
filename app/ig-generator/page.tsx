@@ -6,7 +6,7 @@ export const revalidate = 0;
 export default async function IGGeneratorPage() {
   const { data } = await supabaseAdmin
     .from("locations")
-    .select("id, name, neighborhood, borough, location_type, google_rating, google_review_count, notes, review, days_open, mentions, instagram")
+    .select("id, name, neighborhood, borough, location_type, google_rating, google_review_count, notes, review, days_open, mentions, instagram, photo_url")
     .eq("visible", true)
     .order("name");
 
@@ -27,7 +27,7 @@ export default async function IGGeneratorPage() {
       hours: (r.days_open || "") as string,
       featured_by: mentions.length > 0 ? mentions : null,
       instagram: (r.instagram || "") as string,
-      photo_url: null,
+      photo_url: (r.photo_url || null) as string | null,
     };
   });
 

@@ -29,12 +29,13 @@ interface Location {
   mentions: string[] | null;
   google_rating: number | null;
   google_place_id: string | null;
+  photo_url: string | null;
 }
 
 export default async function PopUpsPage() {
   const { data: popups, count } = await supabase
     .from("locations")
-    .select("id, name, display_name, neighborhood, borough, notes, website, instagram, mentions, google_rating, google_place_id", { count: "exact" })
+    .select("id, name, display_name, neighborhood, borough, notes, website, instagram, mentions, google_rating, google_place_id, photo_url", { count: "exact" })
     .eq("location_type", "Pop-up")
     .order("name");
 
@@ -99,9 +100,19 @@ export default async function PopUpsPage() {
                     background: "#fff",
                     borderRadius: 12,
                     border: "1px solid rgba(139,69,19,0.12)",
-                    padding: "22px 24px",
+                    overflow: "hidden",
                   }}
                 >
+                  {/* Photo */}
+                  {loc.photo_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={loc.photo_url}
+                      alt={`${displayName} cinnamon roll`}
+                      style={{ width: "100%", height: 240, objectFit: "cover", display: "block" }}
+                    />
+                  )}
+                  <div style={{ padding: "22px 24px" }}>
                   {/* Name + sub */}
                   <Link
                     href={`/locations/${locationSlug(loc.name)}`}
@@ -213,6 +224,7 @@ export default async function PopUpsPage() {
                         🌐 Website
                       </a>
                     )}
+                  </div>
                   </div>
                 </div>
               );
