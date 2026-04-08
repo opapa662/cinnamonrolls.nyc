@@ -202,7 +202,7 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
                 {/* Photos area */}
                 {!hasPhotos ? (
                   <div style={{ fontSize: 12, color: "var(--cr-brown-mid)", fontStyle: "italic", marginTop: 8 }}>
-                    No Google photos fetched yet — click Refresh
+                    {!loc.google_place_id ? "No Google ID" : "No Google photos fetched yet — click Refresh"}
                   </div>
                 ) : (
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
