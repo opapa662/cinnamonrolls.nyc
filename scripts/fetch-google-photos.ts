@@ -62,7 +62,7 @@ async function main() {
       const detailsJson = await detailsRes.json();
 
       const photoRefs: string[] = (detailsJson.result?.photos ?? [])
-        .slice(0, 5)
+        .slice(0, 10)
         .map((p: { photo_reference: string }) => p.photo_reference);
 
       if (photoRefs.length === 0) {

@@ -39,7 +39,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   const photoRefs: string[] = (detailsData.result?.photos ?? [])
-    .slice(0, 5)
+    .slice(0, 10)
     .map((p: { photo_reference: string }) => p.photo_reference);
 
   if (photoRefs.length === 0) {

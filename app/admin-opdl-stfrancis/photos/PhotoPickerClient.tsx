@@ -170,8 +170,15 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
                 {/* Top row */}
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: hasPhotos ? 12 : 0 }}>
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: "var(--cr-brown-dark)" }}>
-                      {loc.display_name || loc.name}
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--cr-brown-dark)" }}>
+                        {loc.display_name || loc.name}
+                      </div>
+                      {state.photo_url && (
+                        <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 20, background: "#f0fdf4", color: "#15803d" }}>
+                          Photo set ✓
+                        </span>
+                      )}
                     </div>
                     {(loc.neighborhood || loc.borough) && (
                       <div style={{ fontSize: 12, color: "var(--cr-brown-mid)", marginTop: 2 }}>
