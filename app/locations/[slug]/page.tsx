@@ -74,7 +74,7 @@ function buildJsonLd(loc: Location, slug: string) {
   }
   if (loc.website) data["sameAs"] = loc.website;
   if (loc.location_type) data["servesCuisine"] = "Cinnamon Rolls";
-  data["dateModified"] = "2026-04-08";
+  data["dateModified"] = "2026-04-08T00:00:00Z";
   return data;
 }
 

@@ -73,8 +73,10 @@ export default async function GuidePage() {
         "headline": "The Best Cinnamon Rolls in NYC (2026 Guide)",
         "description": "The definitive guide to NYC's best cinnamon rolls — curated picks across all five boroughs.",
         "url": "https://cinnamonrolls.nyc/guides/best-cinnamon-rolls-nyc",
-        "datePublished": "2025-01-01",
-        "dateModified": "2026-04-08",
+        "datePublished": "2025-01-01T00:00:00Z",
+        "dateModified": "2026-04-08T00:00:00Z",
+        "image": "https://cinnamonrolls.nyc/icon.png",
+        "author": { "@type": "Organization", "name": "cinnamonrolls.nyc", "url": "https://cinnamonrolls.nyc" },
         "publisher": { "@type": "Organization", "name": "cinnamonrolls.nyc", "url": "https://cinnamonrolls.nyc", "logo": "https://cinnamonrolls.nyc/icon.png" },
         "mainEntity": {
           "@type": "ItemList",

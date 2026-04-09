@@ -112,8 +112,10 @@ const typesJsonLd = {
       "headline": "Types of Cinnamon Rolls — A Guide",
       "description": "Classic American, Scandinavian, sourdough, laminated — a guide to the main styles of cinnamon rolls and where to find each one in NYC.",
       "url": "https://cinnamonrolls.nyc/guides/types-of-cinnamon-rolls",
-      "datePublished": "2025-03-01",
-      "dateModified": "2026-04-08",
+      "datePublished": "2025-03-01T00:00:00Z",
+      "dateModified": "2026-04-08T00:00:00Z",
+      "image": "https://cinnamonrolls.nyc/icon.png",
+      "author": { "@type": "Organization", "name": "cinnamonrolls.nyc", "url": "https://cinnamonrolls.nyc" },
       "publisher": {
         "@type": "Organization",
         "name": "cinnamonrolls.nyc",
@@ -231,9 +233,9 @@ export default async function TypesGuidePage() {
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {rs.emoji} {rs.style}
+                    {rs.style}
                     {c && c.count > 0 && (
-                      <span style={{ marginLeft: 6, opacity: 0.55, fontWeight: 400 }}>·{c.count}</span>
+                      <span style={{ marginLeft: 6, opacity: 0.55, fontWeight: 400 }}>· {c.count}</span>
                     )}
                   </a>
                 );
@@ -249,7 +251,6 @@ export default async function TypesGuidePage() {
               <section key={rs.style} id={anchor} style={{ marginBottom: 52, scrollMarginTop: 80 }}>
                 {/* Section header */}
                 <div style={{ marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid rgba(139,69,19,0.1)" }}>
-                  <div style={{ fontSize: 26, marginBottom: 6 }}>{rs.emoji}</div>
                   <h2 style={{ fontSize: 28, fontWeight: 800, color: "var(--cr-brown-dark)", margin: "0 0 4px", letterSpacing: "-0.02em" }}>
                     {rs.style}
                   </h2>
@@ -291,9 +292,9 @@ export default async function TypesGuidePage() {
                 {/* Spots */}
                 {sectionSpots.length > 0 ? (
                   <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: "#9C6B3C", marginBottom: 2 }}>
+                    <h3 style={{ fontSize: 17, fontWeight: 700, color: "var(--cr-brown-dark)", margin: "0 0 12px", letterSpacing: "-0.01em" }}>
                       Where to find {rs.style.toLowerCase()} rolls in NYC
-                    </div>
+                    </h3>
                     {sectionSpots.map((s) => (
                       <GuideSpotCard key={s.id} loc={s} />
                     ))}

@@ -36,6 +36,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/guides/best-cinnamon-rolls-williamsburg`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
     { url: `${base}/guides/best-cinnamon-rolls-prospect-heights`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.75 },
     { url: `${base}/guides/best-cinnamon-rolls-brooklyn-heights`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.75 },
+    { url: `${base}/guides/best-gluten-free-cinnamon-rolls-nyc`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
+    { url: `${base}/guides/best-vegan-cinnamon-rolls-nyc`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
     // Utility pages
     { url: `${base}/today`, lastModified: new Date(), changeFrequency: "daily", priority: 0.8 },
     { url: `${base}/pop-ups`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.75 },

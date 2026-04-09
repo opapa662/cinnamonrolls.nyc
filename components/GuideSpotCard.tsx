@@ -74,22 +74,25 @@ export default function GuideSpotCard({ loc, showNeighborhood = true }: Props) {
         >
           {displayName}
         </Link>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3, flexShrink: 0 }}>
-          {loc.google_rating && (
-            mapsUrl ? (
-              <a href={mapsUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "#9C6B3C", fontWeight: 500, textDecoration: "none", whiteSpace: "nowrap" }}>
-                ⭐ {loc.google_rating.toFixed(1)}
-              </a>
-            ) : (
-              <span style={{ fontSize: 13, color: "#9C6B3C", fontWeight: 500 }}>⭐ {loc.google_rating.toFixed(1)}</span>
-            )
-          )}
-          {loc.price_approx && (
-            <span style={{ fontSize: 12, fontWeight: 600, color: "#7a3e0a", background: "rgba(196,132,58,0.1)", border: "1px solid rgba(196,132,58,0.25)", borderRadius: 20, padding: "1px 8px", whiteSpace: "nowrap" }}>
-              {loc.price_approx}
-            </span>
-          )}
-        </div>
+        {(loc.google_rating || loc.price_approx) && (
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, whiteSpace: "nowrap" }}>
+            {loc.google_rating && (
+              mapsUrl ? (
+                <a href={mapsUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "#9C6B3C", fontWeight: 500, textDecoration: "none" }}>
+                  ⭐ {loc.google_rating.toFixed(1)}
+                </a>
+              ) : (
+                <span style={{ fontSize: 13, color: "#9C6B3C", fontWeight: 500 }}>⭐ {loc.google_rating.toFixed(1)}</span>
+              )
+            )}
+            {loc.google_rating && loc.price_approx && (
+              <span style={{ fontSize: 12, color: "rgba(139,69,19,0.3)" }}>|</span>
+            )}
+            {loc.price_approx && (
+              <span style={{ fontSize: 13, fontWeight: 400, color: "#9C6B3C" }}>{loc.price_approx}</span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Meta + address */}

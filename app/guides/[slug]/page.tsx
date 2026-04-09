@@ -25,12 +25,14 @@ type GuideSection =
 interface GuideConfig {
   borough?: string;
   neighborhood?: string;
+  dietary?: "gluten_free" | "vegan" | "dairy_free";
   title: string;
   metaDescription: string;
   twitterDescription?: string;
   /** Maximum total spots shown (cards + rows). Default: 6 */
   maxSpots?: number;
   sections: GuideSection[];
+  faqs?: Array<{ q: string; a: string }>;
 }
 
 // Shared link style for inline bakery links in editorial copy
@@ -107,6 +109,24 @@ const GUIDES: Record<string, GuideConfig> = {
       { type: "spot", name: "Dreams of Sugar" },
       { type: "more", heading: "More in Brooklyn" },
     ],
+    faqs: [
+      {
+        q: "What is the best cinnamon roll in Brooklyn?",
+        a: "Radio Bakery — with locations in Greenpoint and Prospect Heights — is Brooklyn's most acclaimed spot, known for its sourdough process and glossy finish. Welcome Home in Crown Heights was named New York Times Bakery of the Year in 2025 before it had been open twelve months. Bakeri in Williamsburg is the borough's standout for Scandinavian-style cardamom rolls.",
+      },
+      {
+        q: "What time does Radio Bakery sell out?",
+        a: "Radio Bakery's cinnamon rolls typically sell out by mid-morning on weekends — often before 11am at the Greenpoint flagship. The Prospect Heights location on Washington Avenue tends to last slightly later. Both open at 8am; arrive by 9am for full selection.",
+      },
+      {
+        q: "What neighborhoods in Brooklyn have the best cinnamon rolls?",
+        a: "Greenpoint and Prospect Heights for Radio Bakery. Crown Heights for Welcome Home. Williamsburg for Bakeri's Scandinavian rolls. Carroll Gardens for Winner's classic cream cheese swirl. Bed-Stuy for Dreams of Sugar, a neighborhood favorite built entirely on word of mouth.",
+      },
+      {
+        q: "What makes Brooklyn's cinnamon roll scene different from Manhattan's?",
+        a: "Brooklyn spots tend to have a stronger baking philosophy behind them — Radio Bakery's sourdough process, Bakeri's Scandinavian tradition, Welcome Home's lineage from L'Appartement 4F. The rolls feel more rooted. Manhattan leans toward destination shops and theatrical presentation; Brooklyn rewards repeat visits.",
+      },
+    ],
   },
   "best-cinnamon-rolls-manhattan": {
     borough: "Manhattan",
@@ -138,6 +158,24 @@ const GUIDES: Record<string, GuideConfig> = {
       },
       { type: "spot", name: "Spirals" },
       { type: "more", heading: "More in Manhattan" },
+    ],
+    faqs: [
+      {
+        q: "What is the best cinnamon roll in Manhattan?",
+        a: "The West Village has the highest concentration of acclaimed spots: Benji's Buns (open until midnight), L'Appartement 4F's laminated croissant-dough swirl, and Barachou's $5 roll — which critic site Carboholic rated 9.7 out of 10. In the East Village, Sunday Morning is worth planning a trip around: ten rotating flavors, typically sold out by 11:30am on weekends.",
+      },
+      {
+        q: "Where can I find a late-night cinnamon roll in Manhattan?",
+        a: "Benji's Buns in the West Village is open until midnight — the only dedicated cinnamon roll shop in NYC that works as a late-night option. The quality is consistent; their classic cream cheese swirl at 11pm is the same roll as at 10am.",
+      },
+      {
+        q: "What neighborhoods in Manhattan have the most cinnamon roll shops?",
+        a: "The West Village is NYC's most concentrated roll destination, with Benji's Buns, L'Appartement 4F, and Barachou all within a few blocks. The East Village runs it close — Sunday Morning, Spirals, Red Gate Bakery, and Petit Chou are all within walking distance of each other.",
+      },
+      {
+        q: "How early do I need to arrive at Sunday Morning?",
+        a: "Sunday Morning opens at 9am and typically sells out of most flavors by 11:30am on weekends. Arrive by 10am for full selection. They proof the dough three times and limit production intentionally — ten rotating flavors each day, usually gone before noon.",
+      },
     ],
   },
   "best-cinnamon-rolls-queens": {
@@ -261,6 +299,10 @@ const GUIDES: Record<string, GuideConfig> = {
         type: "text",
         content: "Beyond Bakeri, Williamsburg has a strong supporting cast of cafés and bakeries with rotating seasonal rolls. Weekend mornings are worth planning around, especially in the stretch between Bedford and Driggs.",
       },
+      {
+        type: "text",
+        content: "The neighborhood's food culture has always been early-adopter — if a new roll style is going to surface in Brooklyn first, it's probably here. Worth checking back: Williamsburg has a habit of producing the next thing before the rest of the city catches on.",
+      },
       { type: "more" },
     ],
   },
@@ -281,6 +323,10 @@ const GUIDES: Record<string, GuideConfig> = {
       {
         type: "text",
         content: "Washington Avenue is the main drag: several strong bakeries and coffee shops are within a few blocks of each other, making Prospect Heights a natural destination for a half-morning food walk.",
+      },
+      {
+        type: "text",
+        content: "Go before 11am on weekends — Radio Bakery's cinnamon rolls sell out, and the neighborhood is genuinely pleasant in the early morning before the brunch crowds arrive. The proximity to Prospect Park means you can extend the morning into a walk without needing a plan.",
       },
       { type: "more" },
     ],
@@ -303,7 +349,68 @@ const GUIDES: Record<string, GuideConfig> = {
         type: "text",
         content: "The area's residential calm and proximity to the Brooklyn Heights Promenade makes it one of the most pleasant neighborhoods in the city for a slow-morning pastry run. Combine it with a walk along the Promenade and you have a near-perfect weekend morning in Brooklyn.",
       },
+      {
+        type: "text",
+        content: "Brooklyn Heights rewards the kind of unhurried visit that most NYC neighborhoods don't actually allow. The streets are quiet, the bakeries are good, and you're a five-minute walk from one of the best views in the city. Don't rush it.",
+      },
       { type: "more" },
+    ],
+  },
+  // ── Dietary guides ────────────────────────────────────────────────────────
+  "best-gluten-free-cinnamon-rolls-nyc": {
+    dietary: "gluten_free" as const,
+    title: "The Best Gluten-Free Cinnamon Rolls in NYC (2026 Guide)",
+    metaDescription: "Finding a great gluten-free cinnamon roll in NYC is harder than it sounds. Here are the spots that actually get it right — no sad substitutes.",
+    twitterDescription: "Bub's, Welcome Home, Breads Bakery, Baked — the best gluten-free cinnamon rolls in NYC.",
+    sections: [
+      {
+        type: "text",
+        content: "Gluten-free baking at the level of a great cinnamon roll is genuinely hard. The texture, the chew, the way the dough holds the filling — most attempts fall short. These spots have figured it out.",
+      },
+      {
+        type: "text",
+        content: "Bub's in NoHo is the standard-bearer. Founded by James Beard-nominated baker Melissa Weller, it's NYC's first bakery built to eliminate all top-9 allergens — and the cinnamon roll is their flagship. Gluten-free, dairy-free, vegan, and genuinely excellent.",
+      },
+      { type: "spot", name: "Bub's" },
+      {
+        type: "text",
+        content: "Welcome Home in Crown Heights offers a dedicated gluten-free roll from the New York Times' Bakery of the Year — not an afterthought, a real option.",
+      },
+      { type: "spot", name: "Welcome Home" },
+      {
+        type: "text",
+        content: "Breads Bakery, with locations in Union Square and the Upper West Side, is one of NYC's most acclaimed bakeries. Their gluten-free options reflect the same attention to craft that runs through everything else on the counter.",
+      },
+      { type: "spot", name: "Breads Bakery" },
+      {
+        type: "text",
+        content: "Baked in Red Hook has been a Brooklyn institution for years. Their gluten-free cinnamon roll is consistent, available most days, and worth the trip to Red Hook on its own.",
+      },
+      { type: "spot", name: "Baked" },
+      { type: "more", heading: "All gluten-free spots" },
+    ],
+  },
+  "best-vegan-cinnamon-rolls-nyc": {
+    dietary: "vegan" as const,
+    title: "The Best Vegan Cinnamon Rolls in NYC (2026 Guide)",
+    metaDescription: "NYC's best vegan cinnamon rolls — fully plant-based, no compromises on flavor. The short list of spots worth knowing.",
+    twitterDescription: "Bub's, Petee's — the best vegan cinnamon rolls in NYC.",
+    sections: [
+      {
+        type: "text",
+        content: "Vegan cinnamon rolls in NYC are rarer than you'd expect in a city this size. The format — enriched dough, butter, cream cheese frosting — is inherently dairy-heavy, which makes a great vegan version genuinely impressive when it shows up.",
+      },
+      {
+        type: "text",
+        content: "Bub's in NoHo is the city's most serious answer to this problem. James Beard-nominated baker Melissa Weller built an entire bakery around eliminating the top-9 allergens — dairy, eggs, and gluten included. The cinnamon roll is their best-seller, and it earned that status on flavor alone.",
+      },
+      { type: "spot", name: "Bub's" },
+      {
+        type: "text",
+        content: "Petee's Pie Co. in the Lower East Side is the city's most reliable destination for fully vegan baked goods that don't taste like compromises. Their cinnamon roll earns its place next to the non-vegan options on any honest ranking.",
+      },
+      { type: "spot", name: "Petee's Pie Co." },
+      { type: "more", heading: "All vegan spots" },
     ],
   },
 };
@@ -361,6 +468,8 @@ export default async function GuidePage({
     query = query.eq("neighborhood", guide.neighborhood);
   } else if (guide.borough) {
     query = query.eq("borough", guide.borough);
+  } else if (guide.dietary) {
+    query = query.eq(guide.dietary, true);
   }
 
   const [{ data: locations }, countResult] = await Promise.all([
@@ -377,7 +486,7 @@ export default async function GuidePage({
   );
   const moreSpots = spots.filter((l) => !featuredNames.has(l.name));
 
-  const areaName = guide.neighborhood ?? guide.borough ?? "NYC";
+  const areaName = guide.neighborhood ?? guide.borough ?? (guide.dietary === "gluten_free" ? "NYC (gluten-free)" : guide.dietary === "vegan" ? "NYC (vegan)" : guide.dietary === "dairy_free" ? "NYC (dairy-free)" : "NYC");
   const boroughSlug = guide.borough ? toSlug(guide.borough) : null;
 
   // Breadcrumbs
@@ -391,6 +500,9 @@ export default async function GuidePage({
     breadcrumbs.push({ name: guide.neighborhood });
   } else if (guide.borough) {
     breadcrumbs.push({ name: guide.borough });
+  } else if (guide.dietary) {
+    const label = guide.dietary === "gluten_free" ? "Gluten-Free" : guide.dietary === "vegan" ? "Vegan" : "Dairy-Free";
+    breadcrumbs.push({ name: label });
   }
 
   const jsonLd = {
@@ -401,8 +513,10 @@ export default async function GuidePage({
         "headline": guide.title,
         "description": guide.metaDescription,
         "url": `https://cinnamonrolls.nyc/guides/${slug}`,
-        "datePublished": "2025-03-01",
-        "dateModified": "2026-04-08",
+        "datePublished": "2025-03-01T00:00:00Z",
+        "dateModified": "2026-04-08T00:00:00Z",
+        "image": "https://cinnamonrolls.nyc/icon.png",
+        "author": { "@type": "Organization", "name": "cinnamonrolls.nyc", "url": "https://cinnamonrolls.nyc" },
         "publisher": {
           "@type": "Organization",
           "name": "cinnamonrolls.nyc",
@@ -430,6 +544,14 @@ export default async function GuidePage({
           ...(crumb.href ? { "item": `https://cinnamonrolls.nyc${crumb.href}` } : {}),
         })),
       },
+      ...(guide.faqs ? [{
+        "@type": "FAQPage",
+        "mainEntity": guide.faqs.map(({ q, a }) => ({
+          "@type": "Question",
+          "name": q,
+          "acceptedAnswer": { "@type": "Answer", "text": a },
+        })),
+      }] : []),
     ],
   };
 
@@ -518,6 +640,30 @@ export default async function GuidePage({
               return null;
             })}
           </article>
+
+          {/* FAQ */}
+          {guide.faqs && guide.faqs.length > 0 && (
+            <section style={{ marginBottom: 40 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "0 0 16px" }}>
+                <div style={{ flex: 1, height: 1, background: "rgba(139,69,19,0.12)" }} />
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", color: "#9C6B3C", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                  Common questions
+                </span>
+                <div style={{ flex: 1, height: 1, background: "rgba(139,69,19,0.12)" }} />
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {guide.faqs.map(({ q, a }) => (
+                  <details key={q} style={{ background: "#fff", borderRadius: 10, border: "1px solid rgba(139,69,19,0.1)", padding: "14px 18px" }}>
+                    <summary style={{ fontSize: 14, fontWeight: 700, color: "var(--cr-brown-dark)", cursor: "pointer", listStyle: "none", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                      {q}
+                      <span style={{ fontSize: 18, color: "rgba(139,69,19,0.35)", flexShrink: 0 }}>+</span>
+                    </summary>
+                    <p style={{ fontSize: 14, color: "#5a3a1a", lineHeight: 1.7, margin: "12px 0 0" }}>{a}</p>
+                  </details>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Also read */}
           {RELATED[slug] && (
