@@ -324,7 +324,7 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
                       Click anywhere to set the focal point. Previews match the exact crop on the site.
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {[{ label: "Guide card", height: 160 }, { label: "Bakery page", height: 220 }].map(({ label, height }) => (
+                      {[{ label: "Guide card & Bakery page", height: 220 }].map(({ label, height }) => (
                         <div key={label}>
                           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#9C6B3C", marginBottom: 4 }}>{label}</div>
                           <div

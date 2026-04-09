@@ -63,7 +63,7 @@ export default function GuideSpotCard({ loc, showNeighborhood = true }: Props) {
         <img
           src={loc.photo_url}
           alt={`${loc.display_name ?? loc.name} cinnamon roll`}
-          style={{ width: "100%", height: 160, objectFit: "cover", objectPosition: loc.object_position ?? "center center", display: "block" }}
+          style={{ width: "100%", height: 220, objectFit: "cover", objectPosition: loc.object_position ?? "center center", display: "block" }}
         />
       )}
       <div style={{ padding: "16px 18px" }}>
