@@ -88,6 +88,10 @@ function applyFilters(locations: MapLocation[], filters: Filters): MapLocation[]
       if (!filters.days.some((d) => open.has(d))) return false;
     }
     if (filters.minRating !== null && (loc.google_rating === null || loc.google_rating < filters.minRating)) return false;
+    if (filters.rollStyles.length && !filters.rollStyles.includes(loc.roll_style ?? "")) return false;
+    if (filters.glutenFree && !loc.gluten_free) return false;
+    if (filters.dairyFree && !loc.dairy_free) return false;
+    if (filters.vegan && !loc.vegan) return false;
     return true;
   });
 }

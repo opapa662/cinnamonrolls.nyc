@@ -13,6 +13,10 @@ export interface SidebarLocation {
   created_at: string;
   location_type: string | null;
   days_open: string | null;
+  roll_style: string | null;
+  gluten_free: boolean;
+  dairy_free: boolean;
+  vegan: boolean;
 }
 
 interface SidebarProps {

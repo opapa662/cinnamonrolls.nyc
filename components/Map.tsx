@@ -118,6 +118,18 @@ function createPopupHTML(loc: Location, saved = false): string {
       }</div>`
     : "";
 
+  // Roll style + dietary badges
+  const dietaryBadges: string[] = [];
+  if (loc.gluten_free) dietaryBadges.push("GF");
+  if (loc.dairy_free) dietaryBadges.push("DF");
+  if (loc.vegan) dietaryBadges.push("Vegan");
+  const rollBadgesHTML = (loc.roll_style || dietaryBadges.length > 0)
+    ? `<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;">
+        ${loc.roll_style ? `<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:#fff8ed;color:#8B4513;border:1px solid rgba(139,69,19,0.2);">${loc.roll_style}</span>` : ""}
+        ${dietaryBadges.map((b) => `<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:#f0fdf4;color:#15803d;border:1px solid rgba(21,128,61,0.2);">${b}</span>`).join("")}
+      </div>`
+    : "";
+
   const sources = (loc.mentions ?? []).filter(Boolean);
   const featuredHTML = sources.length
     ? `<div style="margin-top:12px;">
@@ -147,13 +159,14 @@ function createPopupHTML(loc: Location, saved = false): string {
       ${saveBtn}
     </div>
     ${metaHTML}
+    ${rollBadgesHTML}
     ${addressHTML}
     ${loc.notes ? `<div style="margin-top:10px;font-size:13px;color:#5a3a1a;line-height:1.6;">${loc.notes}</div>` : ""}
     ${featuredHTML}
     ${linksHTML}
     <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(139,69,19,0.1);display:flex;align-items:center;justify-content:space-between;">
       <a href="/locations/${locationSlug(loc.name)}" style="font-size:12px;font-weight:600;color:#8B4513;text-decoration:none;">View details →</a>
-      <button class="cr-popup-share" data-url="https://cinnamonrolls.nyc/locations/${locationSlug(loc.name)}" data-title="${displayName} — cinnamonrolls.nyc" aria-label="Share" style="background:none;border:none;cursor:pointer;padding:4px;line-height:1;display:flex;align-items:center;gap:5px;font-size:12px;color:#8b4513;font-weight:500;outline:none;">${SHARE_ICON} Share</button>
+      <button class="cr-popup-share" data-url="https://cinnamonrolls.nyc/locations/${locationSlug(loc.name)}" data-title="${displayName} - cinnamonrolls.nyc" aria-label="Share" style="background:none;border:none;cursor:pointer;padding:4px;line-height:1;display:flex;align-items:center;gap:5px;font-size:12px;color:#8B4513;font-weight:600;outline:none;">${SHARE_ICON} Share</button>
     </div>
   </div>`;
 }

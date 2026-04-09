@@ -8,7 +8,7 @@ export const revalidate = 3600; // Revalidate every hour — locations change in
 export default async function Home() {
   const { data: locations, count } = await supabase
     .from("locations")
-    .select("id, name, display_name, latitude, longitude, neighborhood, borough, notes, website, instagram, location_type, days_open, created_at, mentions, google_place_id, google_rating, google_hours, formatted_address", { count: "exact" })
+    .select("id, name, display_name, latitude, longitude, neighborhood, borough, notes, website, instagram, location_type, days_open, created_at, mentions, google_place_id, google_rating, google_hours, formatted_address, roll_style, gluten_free, dairy_free, vegan", { count: "exact" })
     .eq("visible", true)
     .order("name");
 

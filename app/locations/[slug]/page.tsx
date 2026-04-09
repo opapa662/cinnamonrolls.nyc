@@ -29,12 +29,17 @@ interface Location {
   latitude: number;
   longitude: number;
   photo_url: string | null;
+  roll_style: string | null;
+  frosting_type: string | null;
+  gluten_free: boolean;
+  dairy_free: boolean;
+  vegan: boolean;
 }
 
 async function getLocations(): Promise<Location[]> {
   const { data } = await supabase
     .from("locations")
-    .select("id, name, display_name, neighborhood, borough, location_type, notes, website, instagram, mentions, days_open, google_rating, google_review_count, google_place_id, google_hours, formatted_address, latitude, longitude, photo_url")
+    .select("id, name, display_name, neighborhood, borough, location_type, notes, website, instagram, mentions, days_open, google_rating, google_review_count, google_place_id, google_hours, formatted_address, latitude, longitude, photo_url, roll_style, frosting_type, gluten_free, dairy_free, vegan")
     .eq("visible", true);
   return data ?? [];
 }
@@ -186,7 +191,7 @@ export default async function LocationPage({ params }: { params: Promise<{ slug:
             </h1>
             <ShareButton
               url={`https://cinnamonrolls.nyc/locations/${slug}`}
-              title={`${name} — cinnamonrolls.nyc`}
+              title={`${name} - cinnamonrolls.nyc`}
               text={`Check out ${name} on cinnamonrolls.nyc`}
               style={{ marginTop: 6 }}
             />
@@ -262,6 +267,25 @@ export default async function LocationPage({ params }: { params: Promise<{ slug:
                   {!multiLocation && sub && (
                     <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "#9C6B3C", marginBottom: 6 }}>
                       {sub.toUpperCase()}
+                    </div>
+                  )}
+
+                  {/* Roll style + dietary badges */}
+                  {(loc.roll_style || loc.gluten_free || loc.dairy_free || loc.vegan) && (
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
+                      {loc.roll_style && (
+                        <span style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: "#fff8ed", color: "#8B4513", border: "1px solid rgba(139,69,19,0.2)" }}>
+                          {loc.roll_style}
+                        </span>
+                      )}
+                      {loc.frosting_type && (
+                        <span style={{ fontSize: 12, fontWeight: 500, padding: "3px 10px", borderRadius: 20, background: "rgba(139,69,19,0.06)", color: "#7A4010", border: "1px solid rgba(139,69,19,0.15)" }}>
+                          {loc.frosting_type}
+                        </span>
+                      )}
+                      {loc.gluten_free && <span style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: "#f0fdf4", color: "#15803d", border: "1px solid rgba(21,128,61,0.2)" }}>GF</span>}
+                      {loc.dairy_free  && <span style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: "#f0fdf4", color: "#15803d", border: "1px solid rgba(21,128,61,0.2)" }}>DF</span>}
+                      {loc.vegan       && <span style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: "#f0fdf4", color: "#15803d", border: "1px solid rgba(21,128,61,0.2)" }}>Vegan</span>}
                     </div>
                   )}
 

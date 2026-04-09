@@ -21,7 +21,10 @@ export const metadata: Metadata = {
   title: "cinnamonrolls.nyc - the ultimate map of the city's best swirls",
   description:
     "An interactive map of NYC's best cinnamon roll spots. Find the perfect swirl near you — by neighborhood, borough, or wherever you are.",
-  icons: { icon: "/icon.png", apple: "/icon.png" },
+  icons: {
+    icon: "/icon.png",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   alternates: {
     canonical: "https://cinnamonrolls.nyc",
   },

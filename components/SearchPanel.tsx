@@ -10,6 +10,10 @@ export interface Filters {
   days: string[];
   neighborhoods: string[];
   minRating: number | null;
+  rollStyles: string[];
+  glutenFree: boolean;
+  dairyFree: boolean;
+  vegan: boolean;
 }
 
 export const EMPTY_FILTERS: Filters = {
@@ -19,10 +23,14 @@ export const EMPTY_FILTERS: Filters = {
   days: [],
   neighborhoods: [],
   minRating: null,
+  rollStyles: [],
+  glutenFree: false,
+  dairyFree: false,
+  vegan: false,
 };
 
 export function hasActiveFilters(f: Filters): boolean {
-  return !!(f.query || f.boroughs.length || f.types.length || f.days.length || f.neighborhoods.length || f.minRating !== null);
+  return !!(f.query || f.boroughs.length || f.types.length || f.days.length || f.neighborhoods.length || f.minRating !== null || f.rollStyles.length || f.glutenFree || f.dairyFree || f.vegan);
 }
 
 const TYPE_LABELS: Record<string, string> = {
@@ -311,6 +319,31 @@ export default function SearchPanel({ filters, onChange, onClose, locations, fil
                 fixedWidth
               />
             ))}
+          </div>
+        </div>
+
+        {/* Roll Style */}
+        <div>
+          <div style={sectionLabel}>Roll Style</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {["Classic American", "Scandinavian", "Sourdough", "Laminated", "Japanese Milk Bread"].map((s) => (
+              <Chip
+                key={s}
+                label={s}
+                active={filters.rollStyles.includes(s)}
+                onClick={() => onChange({ ...filters, rollStyles: toggle(filters.rollStyles, s) })}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Dietary */}
+        <div>
+          <div style={sectionLabel}>Dietary</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            <Chip label="Gluten-Free" active={filters.glutenFree} onClick={() => onChange({ ...filters, glutenFree: !filters.glutenFree })} />
+            <Chip label="Dairy-Free"  active={filters.dairyFree}  onClick={() => onChange({ ...filters, dairyFree:  !filters.dairyFree  })} />
+            <Chip label="Vegan"       active={filters.vegan}       onClick={() => onChange({ ...filters, vegan:       !filters.vegan       })} />
           </div>
         </div>
 
