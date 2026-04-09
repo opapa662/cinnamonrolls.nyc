@@ -95,6 +95,16 @@ const GUIDES: Record<string, GuideConfig> = {
         content: <>In Williamsburg, <Link href="/locations/bakeri" style={il}>Bakeri</Link> approaches the cinnamon roll from a Scandinavian angle: cardamom-forward, airy, and deliberately less sweet than the American style. It's a useful reminder that the roll is a global format, not a monolithic one.</>,
       },
       { type: "spot", name: "Bakeri" },
+      {
+        type: "text",
+        content: "Winner in Carroll Gardens keeps things simple: a classic cream cheese swirl, baked daily, no gimmicks. It's the kind of roll that reminds you why the format works.",
+      },
+      { type: "spot", name: "Winner" },
+      {
+        type: "text",
+        content: "Dreams of Sugar in Bed-Stuy is the borough's most community-rooted roll spot — a neighborhood bakery with a loyal following that's built its reputation entirely by word of mouth.",
+      },
+      { type: "spot", name: "Dreams of Sugar" },
       { type: "more", heading: "More in Brooklyn" },
     ],
   },
@@ -119,9 +129,14 @@ const GUIDES: Record<string, GuideConfig> = {
       { type: "spot", name: "Barachou" },
       {
         type: "text",
-        content: <>In the East Village, <Link href="/locations/sunday-morning" style={il}>Sunday Morning</Link> proofs its dough three times and limits production — ten rotating flavors, out the door by 11:30am most weekends. <Link href="/locations/spirals" style={il}>Spirals</Link> finishes every roll with a signature shortbread crumble you won't find anywhere else.</>,
+        content: "In the East Village, Sunday Morning proofs its dough three times and limits production — ten rotating flavors, out the door by 11:30am most weekends.",
       },
       { type: "spot", name: "Sunday Morning" },
+      {
+        type: "text",
+        content: "Spirals, also in the East Village, finishes every roll with a signature shortbread crumble. It's a small detail that's become the shop's identity — nobody else in the city does it.",
+      },
+      { type: "spot", name: "Spirals" },
       { type: "more", heading: "More in Manhattan" },
     ],
   },
@@ -138,6 +153,14 @@ const GUIDES: Record<string, GuideConfig> = {
         content: <>Queens is still developing its cinnamon roll scene, but what's here is worth knowing. <Link href="/locations/serano-bakery" style={il}>Serano Bakery</Link> in Astoria is the borough's anchor — a neighborhood staple that's been turning out classic rolls alongside its broader pastry menu for years, with a loyal local following that doesn't need to make the trip to Brooklyn to get their fix.</>,
       },
       { type: "spot", name: "Serano Bakery" },
+      {
+        type: "text",
+        content: "Queens is NYC's most diverse borough — and that diversity shapes its bakery culture. The spots here tend to serve broader neighborhood communities rather than destination visitors, which means you're more likely to find a roll that's earned its place on the menu through years of repeat customers than one that was designed to photograph well.",
+      },
+      {
+        type: "text",
+        content: <>Astoria is the most developed neighborhood for pastry hunting in Queens: a dense mix of Greek, Eastern European, and Middle Eastern bakers who&apos;ve been working with enriched doughs for decades. The cinnamon roll as a format fits naturally into that tradition even when it&apos;s not the headline item. Walk along Steinway Street or Ditmars Boulevard and you&apos;ll find more than what&apos;s mapped here.</>,
+      },
       {
         type: "text",
         content: "As Queens' independent food scene continues to mature, it's the borough on this map we're watching most closely. Expect new additions.",
@@ -331,7 +354,7 @@ export default async function GuidePage({
 
   let query = supabase
     .from("locations")
-    .select("id, name, display_name, neighborhood, borough, location_type, notes, google_rating, google_place_id, formatted_address, mentions")
+    .select("id, name, display_name, neighborhood, borough, location_type, notes, google_rating, google_place_id, formatted_address, mentions, photo_url, roll_style, frosting_types, gluten_free, dairy_free, vegan, price_approx")
     .eq("visible", true);
 
   if (guide.neighborhood) {
@@ -372,27 +395,42 @@ export default async function GuidePage({
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": guide.title,
-    "description": guide.metaDescription,
-    "url": `https://cinnamonrolls.nyc/guides/${slug}`,
-    "publisher": {
-      "@type": "Organization",
-      "name": "cinnamonrolls.nyc",
-      "url": "https://cinnamonrolls.nyc",
-      "logo": "https://cinnamonrolls.nyc/icon.png",
-    },
-    "mainEntity": {
-      "@type": "ItemList",
-      "name": guide.title,
-      "numberOfItems": spots.length,
-      "itemListElement": spots.map((l, i) => ({
-        "@type": "ListItem",
-        "position": i + 1,
-        "name": l.display_name ?? l.name,
-        "url": `https://cinnamonrolls.nyc/locations/${locationSlug(l.name)}`,
-      })),
-    },
+    "@graph": [
+      {
+        "@type": "Article",
+        "headline": guide.title,
+        "description": guide.metaDescription,
+        "url": `https://cinnamonrolls.nyc/guides/${slug}`,
+        "datePublished": "2025-03-01",
+        "dateModified": "2026-04-08",
+        "publisher": {
+          "@type": "Organization",
+          "name": "cinnamonrolls.nyc",
+          "url": "https://cinnamonrolls.nyc",
+          "logo": "https://cinnamonrolls.nyc/icon.png",
+        },
+        "mainEntity": {
+          "@type": "ItemList",
+          "name": guide.title,
+          "numberOfItems": spots.length,
+          "itemListElement": spots.map((l, i) => ({
+            "@type": "ListItem",
+            "position": i + 1,
+            "name": l.display_name ?? l.name,
+            "url": `https://cinnamonrolls.nyc/locations/${locationSlug(l.name)}`,
+          })),
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": breadcrumbs.map((crumb, i) => ({
+          "@type": "ListItem",
+          "position": i + 1,
+          "name": crumb.name,
+          ...(crumb.href ? { "item": `https://cinnamonrolls.nyc${crumb.href}` } : {}),
+        })),
+      },
+    ],
   };
 
   return (
@@ -429,6 +467,7 @@ export default async function GuidePage({
               />
             </div>
             <div style={{ height: 2, background: "rgba(139,69,19,0.12)", borderRadius: 1 }} />
+            <div style={{ fontSize: 12, color: "rgba(139,69,19,0.45)", marginTop: 8 }}>Updated April 2026</div>
           </div>
 
           {/* Article body — sections interleave text, spot picks, and row lists */}
@@ -455,10 +494,8 @@ export default async function GuidePage({
               }
 
               if (section.type === "more" && moreSpots.length > 0) {
-                const heading = section.heading ?? (featuredNames.size > 0 ? `Also worth knowing` : `All spots in ${areaName}`);
-                const budget = section.max ?? Math.max(0, (guide.maxSpots ?? 6) - featuredNames.size);
-                const shown = budget > 0 ? moreSpots.slice(0, budget) : moreSpots;
-                const hidden = budget > 0 ? moreSpots.slice(budget) : [];
+                const heading = section.heading ?? (featuredNames.size > 0 ? `Also in ${areaName}` : `All spots in ${areaName}`);
+                const shown = section.max ? moreSpots.slice(0, section.max) : moreSpots;
                 if (shown.length === 0) return null;
                 return (
                   <section key={i} style={{ marginTop: 8, marginBottom: 32 }}>
@@ -474,14 +511,6 @@ export default async function GuidePage({
                         <LocationRow key={loc.id} loc={loc} showNeighborhood={!guide.neighborhood} />
                       ))}
                     </div>
-                    {hidden.length > 0 && boroughSlug && (
-                      <Link
-                        href={`/boroughs/${boroughSlug}`}
-                        style={{ display: "inline-block", marginTop: 12, fontSize: 13, color: "#9C6B3C", fontWeight: 600, textDecoration: "none" }}
-                      >
-                        + {hidden.length} more in {guide.borough} →
-                      </Link>
-                    )}
                   </section>
                 );
               }

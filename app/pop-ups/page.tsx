@@ -30,12 +30,16 @@ interface Location {
   google_rating: number | null;
   google_place_id: string | null;
   photo_url: string | null;
+  roll_style: string | null;
+  gluten_free: boolean;
+  dairy_free: boolean;
+  vegan: boolean;
 }
 
 export default async function PopUpsPage() {
   const { data: popups, count } = await supabase
     .from("locations")
-    .select("id, name, display_name, neighborhood, borough, notes, website, instagram, mentions, google_rating, google_place_id, photo_url", { count: "exact" })
+    .select("id, name, display_name, neighborhood, borough, notes, website, instagram, mentions, google_rating, google_place_id, photo_url, roll_style, gluten_free, dairy_free, vegan", { count: "exact" })
     .eq("location_type", "Pop-up")
     .order("name");
 
@@ -147,6 +151,20 @@ export default async function PopUpsPage() {
                   {loc.google_rating && (
                     <div style={{ fontSize: 14, color: "#5a3a1a", marginBottom: 10 }}>
                       ⭐ {loc.google_rating.toFixed(1)}
+                    </div>
+                  )}
+
+                  {/* Roll style + dietary badges */}
+                  {(loc.roll_style || loc.gluten_free || loc.dairy_free || loc.vegan) && (
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
+                      {loc.roll_style && (
+                        <span style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: "#fff8ed", color: "#8B4513", border: "1px solid rgba(139,69,19,0.2)" }}>
+                          {loc.roll_style}
+                        </span>
+                      )}
+                      {loc.gluten_free && <span style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: "#f0fdf4", color: "#15803d", border: "1px solid rgba(21,128,61,0.2)" }}>GF</span>}
+                      {loc.dairy_free  && <span style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: "#f0fdf4", color: "#15803d", border: "1px solid rgba(21,128,61,0.2)" }}>DF</span>}
+                      {loc.vegan       && <span style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: "#f0fdf4", color: "#15803d", border: "1px solid rgba(21,128,61,0.2)" }}>Vegan</span>}
                     </div>
                   )}
 

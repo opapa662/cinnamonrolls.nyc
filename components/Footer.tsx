@@ -31,6 +31,13 @@ export default function Footer() {
       </a>
       <span style={{ fontSize: "12px", color: "rgba(139,69,19,0.3)" }}>|</span>
       <Link
+        href="/guides"
+        style={{ fontSize: "12px", fontWeight: 500, color: "#9C6B3C", textDecoration: "none" }}
+      >
+        Guides
+      </Link>
+      <span style={{ fontSize: "12px", color: "rgba(139,69,19,0.3)" }}>|</span>
+      <Link
         href="/about"
         style={{ fontSize: "12px", fontWeight: 500, color: "#9C6B3C", textDecoration: "none" }}
       >

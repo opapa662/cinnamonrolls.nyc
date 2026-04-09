@@ -49,12 +49,26 @@ interface AnalyticsData {
   outboundByType: { name: string; count: number }[];
 }
 
+interface Review {
+  id: string;
+  reviewer_name: string;
+  reviewer_email: string | null;
+  rating: number;
+  body: string;
+  visited_at: string | null;
+  roll_style_tried: string | null;
+  status: "pending" | "approved" | "rejected";
+  created_at: string;
+  location: { id: string; name: string; display_name: string | null } | null;
+}
+
 interface Props {
   submissions: Submission[];
   locations: Location[];
   locationCount: number;
   contacts: Contact[];
   analytics: AnalyticsData;
+  reviews: Review[];
 }
 
 function timeAgo(dateStr: string) {
@@ -77,16 +91,19 @@ const TYPE_COLORS: Record<string, { bg: string; color: string }> = {
   edit: { bg: "#fefce8", color: "#854d0e" },
 };
 
-export default function AdminDashboard({ submissions, locations, locationCount, contacts, analytics }: Props) {
+export default function AdminDashboard({ submissions, locations, locationCount, contacts, analytics, reviews }: Props) {
   const router = useRouter();
-  const [tab, setTab] = useState<"submissions" | "contacts" | "locations" | "analytics">("submissions");
+  const [tab, setTab] = useState<"submissions" | "contacts" | "locations" | "analytics" | "reviews">("submissions");
   const [subFilter, setSubFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
   const [submissionStates, setSubmissionStates] = useState<Record<string, Submission["status"]>>({});
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
   const [locationVisibility, setLocationVisibility] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState<Record<string, boolean>>({});
+  const [reviewStates, setReviewStates] = useState<Record<string, Review["status"]>>({});
+  const [reviewFilter, setReviewFilter] = useState<"pending" | "approved" | "rejected" | "all">("pending");
 
   const pendingCount = submissions.filter((s) => (submissionStates[s.id] ?? s.status) === "pending").length;
+  const pendingReviewCount = reviews.filter((r) => (reviewStates[r.id] ?? r.status) === "pending").length;
 
   const filteredSubmissions = submissions.filter((s) => {
     if (dismissedIds.has(s.id)) return false;
@@ -118,6 +135,16 @@ export default function AdminDashboard({ submissions, locations, locationCount, 
   const dismissSubmission = useCallback(async (id: string) => {
     const ok = await patch(`/api/admin-opdl-stfrancis/submissions/${id}`, { action: "dismiss" }, id);
     if (ok) setDismissedIds((p) => new Set([...p, id]));
+  }, [patch]);
+
+  const approveReview = useCallback(async (id: string) => {
+    const ok = await patch(`/api/admin-opdl-stfrancis/reviews/${id}`, { action: "approve" }, id);
+    if (ok) setReviewStates((p) => ({ ...p, [id]: "approved" }));
+  }, [patch]);
+
+  const rejectReview = useCallback(async (id: string) => {
+    const ok = await patch(`/api/admin-opdl-stfrancis/reviews/${id}`, { action: "reject" }, id);
+    if (ok) setReviewStates((p) => ({ ...p, [id]: "rejected" }));
   }, [patch]);
 
   const toggleVisibility = useCallback(async (loc: Location) => {
@@ -156,7 +183,7 @@ export default function AdminDashboard({ submissions, locations, locationCount, 
           {[
             { label: "Active locations", value: locationCount },
             { label: "Pending submissions", value: pendingCount, highlight: pendingCount > 0 },
-            { label: "Total submissions", value: submissions.length },
+            { label: "Pending reviews", value: pendingReviewCount, highlight: pendingReviewCount > 0 },
             { label: "Contact messages", value: contacts.length },
           ].map(({ label, value, highlight }) => (
             <div key={label} style={{ background: "#fff", borderRadius: 12, padding: "18px 20px", border: `1px solid ${highlight ? "rgba(194,65,12,0.3)" : "rgba(139,69,19,0.1)"}`, boxShadow: highlight ? "0 0 0 3px rgba(194,65,12,0.08)" : "none" }}>
@@ -168,13 +195,15 @@ export default function AdminDashboard({ submissions, locations, locationCount, 
 
         {/* Tabs */}
         <div style={{ display: "flex", gap: 2, background: "rgba(139,69,19,0.07)", borderRadius: 10, padding: 3, marginBottom: 24, width: "fit-content" }}>
-          {(["submissions", "contacts", "locations", "analytics"] as const).map((t) => (
+          {(["submissions", "reviews", "contacts", "locations", "analytics"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
               style={{ padding: "7px 20px", fontSize: 13, fontWeight: 600, borderRadius: 8, border: "none", cursor: "pointer", background: tab === t ? "#fff" : "transparent", color: tab === t ? "var(--cr-brown-dark)" : "var(--cr-brown-mid)", boxShadow: tab === t ? "0 1px 4px rgba(139,69,19,0.12)" : "none", fontFamily: "inherit", transition: "all 0.15s", textTransform: "capitalize" }}
             >
-              {t}{t === "submissions" && pendingCount > 0 ? ` (${pendingCount})` : ""}
+              {t}
+              {t === "submissions" && pendingCount > 0 ? ` (${pendingCount})` : ""}
+              {t === "reviews" && pendingReviewCount > 0 ? ` (${pendingReviewCount})` : ""}
             </button>
           ))}
         </div>
@@ -261,6 +290,79 @@ export default function AdminDashboard({ submissions, locations, locationCount, 
                     </div>
                   );
                 })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Reviews */}
+        {tab === "reviews" && (
+          <div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
+              {(["pending", "all", "approved", "rejected"] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setReviewFilter(f)}
+                  style={{ padding: "5px 14px", fontSize: 12, fontWeight: 600, borderRadius: 20, border: "1.5px solid", cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s", borderColor: reviewFilter === f ? "var(--cr-brown)" : "rgba(139,69,19,0.2)", background: reviewFilter === f ? "var(--cr-brown)" : "#fff", color: reviewFilter === f ? "#fff" : "var(--cr-brown-mid)", textTransform: "capitalize" }}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+
+            {reviews.filter((r) => reviewFilter === "all" || (reviewStates[r.id] ?? r.status) === reviewFilter).length === 0 ? (
+              <div style={{ textAlign: "center", padding: "40px 0", color: "var(--cr-brown-mid)", fontSize: 14 }}>
+                No {reviewFilter !== "all" ? reviewFilter : ""} reviews
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {reviews
+                  .filter((r) => reviewFilter === "all" || (reviewStates[r.id] ?? r.status) === reviewFilter)
+                  .map((review) => {
+                    const status = reviewStates[review.id] ?? review.status;
+                    const isPending = status === "pending";
+                    const statusColor = STATUS_COLORS[status];
+                    const stars = "★".repeat(review.rating) + "☆".repeat(5 - review.rating);
+                    return (
+                      <div key={review.id} style={{ background: "#fff", borderRadius: 12, padding: "18px 20px", border: "1px solid rgba(139,69,19,0.1)", opacity: loading[review.id] ? 0.6 : 1 }}>
+                        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                            <span style={{ fontSize: 14, color: "#e8a020", letterSpacing: 1 }}>{stars}</span>
+                            <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 20, background: statusColor.bg, color: statusColor.color, textTransform: "capitalize" }}>{status}</span>
+                            <span style={{ fontSize: 11, color: "var(--cr-brown-mid)" }}>{timeAgo(review.created_at)}</span>
+                          </div>
+                          {isPending && (
+                            <div style={{ display: "flex", gap: 8 }}>
+                              <button
+                                onClick={() => approveReview(review.id)}
+                                disabled={loading[review.id]}
+                                style={{ padding: "6px 16px", fontSize: 12, fontWeight: 600, background: "#15803d", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer", fontFamily: "inherit" }}
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => rejectReview(review.id)}
+                                disabled={loading[review.id]}
+                                style={{ padding: "6px 16px", fontSize: 12, fontWeight: 600, background: "#fff", color: "#b91c1c", border: "1.5px solid #b91c1c", borderRadius: 6, cursor: "pointer", fontFamily: "inherit" }}
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
+                          <Row label="Location" value={review.location?.display_name ?? review.location?.name ?? review.id} />
+                          <Row label="Reviewer" value={review.reviewer_name + (review.reviewer_email ? ` <${review.reviewer_email}>` : "")} />
+                          {review.roll_style_tried && <Row label="Roll tried" value={review.roll_style_tried} />}
+                          {review.visited_at && <Row label="Visited" value={review.visited_at} />}
+                          <div style={{ display: "flex", gap: 8, fontSize: 13 }}>
+                            <span style={{ color: "var(--cr-brown-mid)", fontWeight: 500, minWidth: 64, flexShrink: 0 }}>Review</span>
+                            <span style={{ color: "var(--cr-brown-dark)", lineHeight: 1.6 }}>{review.body}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             )}
           </div>

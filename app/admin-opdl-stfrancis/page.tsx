@@ -16,7 +16,7 @@ export default async function AdminPage() {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [{ data: submissions }, { data: locations }, { data: contacts }, { data: events }] = await Promise.all([
+  const [{ data: submissions }, { data: locations }, { data: contacts }, { data: events }, { data: reviews }] = await Promise.all([
     supabaseAdmin
       .from("submissions")
       .select("*, location:location_id(id, name, display_name, neighborhood, borough)")
@@ -35,6 +35,10 @@ export default async function AdminPage() {
       .select("session_id, event_name, properties, created_at")
       .gte("created_at", thirtyDaysAgo)
       .limit(5000),
+    supabaseAdmin
+      .from("reviews")
+      .select("id, reviewer_name, reviewer_email, rating, body, visited_at, roll_style_tried, status, created_at, location:location_id(id, name, display_name)")
+      .order("created_at", { ascending: false }),
   ]);
 
   const evts = events ?? [];
@@ -55,6 +59,7 @@ export default async function AdminPage() {
       locationCount={activeCount}
       contacts={contacts ?? []}
       analytics={{ sessions7d, sessions30d, topPins, topLocations, deviceSplit, outboundByType }}
+      reviews={(reviews ?? []) as unknown as Parameters<typeof AdminDashboard>[0]["reviews"]}
     />
   );
 }

@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { locationSlug, toSlug } from "@/lib/location-slug";
 import ShareButton from "@/components/ShareButton";
 import { cleanAddress } from "@/lib/address";
+import ReviewsSection from "@/components/ReviewsSection";
 
 interface Location {
   id: string;
@@ -31,15 +32,17 @@ interface Location {
   photo_url: string | null;
   roll_style: string | null;
   frosting_type: string | null;
+  frosting_types: string[] | null;
   gluten_free: boolean;
   dairy_free: boolean;
   vegan: boolean;
+  price_approx: string | null;
 }
 
 async function getLocations(): Promise<Location[]> {
   const { data } = await supabase
     .from("locations")
-    .select("id, name, display_name, neighborhood, borough, location_type, notes, website, instagram, mentions, days_open, google_rating, google_review_count, google_place_id, google_hours, formatted_address, latitude, longitude, photo_url, roll_style, frosting_type, gluten_free, dairy_free, vegan")
+    .select("id, name, display_name, neighborhood, borough, location_type, notes, website, instagram, mentions, days_open, google_rating, google_review_count, google_place_id, google_hours, formatted_address, latitude, longitude, photo_url, roll_style, frosting_type, frosting_types, gluten_free, dairy_free, vegan, price_approx")
     .eq("visible", true);
   return data ?? [];
 }
@@ -71,10 +74,12 @@ function buildJsonLd(loc: Location, slug: string) {
   }
   if (loc.website) data["sameAs"] = loc.website;
   if (loc.location_type) data["servesCuisine"] = "Cinnamon Rolls";
+  data["dateModified"] = "2026-04-08";
   return data;
 }
 
 export const dynamicParams = false;
+export const revalidate = 0;
 
 export async function generateStaticParams() {
   const locations = await getLocations();
@@ -206,6 +211,12 @@ export default async function LocationPage({ params }: { params: Promise<{ slug:
                 <span>{first.days_open}</span>
               </>
             )}
+            {first.price_approx && (
+              <>
+                <span style={{ color: "rgba(139,69,19,0.25)" }}>|</span>
+                <span style={{ fontWeight: 600 }}>{first.price_approx} per roll</span>
+              </>
+            )}
           </div>
 
           {/* Shared links */}
@@ -224,10 +235,32 @@ export default async function LocationPage({ params }: { params: Promise<{ slug:
             </div>
           )}
 
+          {/* Roll Styles */}
+          {(first.roll_style || (first.frosting_types ?? []).length > 0 || first.gluten_free || first.dairy_free || first.vegan) && (
+            <div style={{ marginBottom: 24 }}>
+              <h2 style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "#9C6B3C", margin: "0 0 8px" }}>ROLL STYLES</h2>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {first.roll_style && (
+                  <span style={{ fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 20, background: "rgba(196,132,58,0.1)", color: "#7a3e0a", border: "1px solid rgba(196,132,58,0.3)" }}>
+                    {first.roll_style}
+                  </span>
+                )}
+                {(first.frosting_types ?? []).map((f) => (
+                  <span key={f} style={{ fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 20, background: "rgba(196,132,58,0.1)", color: "#7a3e0a", border: "1px solid rgba(196,132,58,0.3)" }}>
+                    {f}
+                  </span>
+                ))}
+                {first.gluten_free && <span style={{ fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 20, background: "#f0fdf4", color: "#15803d", border: "1px solid rgba(21,128,61,0.2)" }}>Gluten-free</span>}
+                {first.dairy_free  && <span style={{ fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 20, background: "#f0fdf4", color: "#15803d", border: "1px solid rgba(21,128,61,0.2)" }}>Dairy-free</span>}
+                {first.vegan       && <span style={{ fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 20, background: "#f0fdf4", color: "#15803d", border: "1px solid rgba(21,128,61,0.2)" }}>Vegan</span>}
+              </div>
+            </div>
+          )}
+
           {/* Press & Recognition */}
           {allMentions.length > 0 && (
             <div style={{ marginBottom: 28 }}>
-              <h2 style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "#9C6B3C", margin: "0 0 8px" }}>AS SEEN IN</h2>
+              <h2 style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "#9C6B3C", margin: "0 0 8px" }}>FEATURED IN</h2>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                 {allMentions.map((m) => (
                   <span key={m} style={{ fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 20, background: "#fff8ed", color: "#8B4513", border: "1px solid rgba(139,69,19,0.25)" }}>
@@ -270,25 +303,6 @@ export default async function LocationPage({ params }: { params: Promise<{ slug:
                     </div>
                   )}
 
-                  {/* Roll style + dietary badges */}
-                  {(loc.roll_style || loc.gluten_free || loc.dairy_free || loc.vegan) && (
-                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
-                      {loc.roll_style && (
-                        <span style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: "#fff8ed", color: "#8B4513", border: "1px solid rgba(139,69,19,0.2)" }}>
-                          {loc.roll_style}
-                        </span>
-                      )}
-                      {loc.frosting_type && (
-                        <span style={{ fontSize: 12, fontWeight: 500, padding: "3px 10px", borderRadius: 20, background: "rgba(139,69,19,0.06)", color: "#7A4010", border: "1px solid rgba(139,69,19,0.15)" }}>
-                          {loc.frosting_type}
-                        </span>
-                      )}
-                      {loc.gluten_free && <span style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: "#f0fdf4", color: "#15803d", border: "1px solid rgba(21,128,61,0.2)" }}>GF</span>}
-                      {loc.dairy_free  && <span style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: "#f0fdf4", color: "#15803d", border: "1px solid rgba(21,128,61,0.2)" }}>DF</span>}
-                      {loc.vegan       && <span style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: "#f0fdf4", color: "#15803d", border: "1px solid rgba(21,128,61,0.2)" }}>Vegan</span>}
-                    </div>
-                  )}
-
                   {/* Rating */}
                   {loc.google_rating && (
                     <div style={{ fontSize: 13, color: "#5a3a1a", marginBottom: loc.notes ? 8 : 0 }}>
@@ -318,9 +332,12 @@ export default async function LocationPage({ params }: { params: Promise<{ slug:
 
                   {/* Notes */}
                   {loc.notes && (
-                    <p style={{ fontSize: 14, color: "#5a3a1a", lineHeight: 1.7, margin: "8px 0 0" }}>
-                      {loc.notes}
-                    </p>
+                    <div style={{ marginTop: 12 }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#9C6B3C", marginBottom: 5 }}>What to know</div>
+                      <p style={{ fontSize: 14, color: "#5a3a1a", lineHeight: 1.7, margin: 0 }}>
+                        {loc.notes}
+                      </p>
+                    </div>
                   )}
 
                   {/* Static map */}
@@ -388,6 +405,11 @@ export default async function LocationPage({ params }: { params: Promise<{ slug:
               )}
             </div>
           )}
+
+          {/* Visitor reviews */}
+          <ReviewsSection locationId={first.id} locationName={name} />
+
+          <div style={{ height: 1, background: "rgba(139,69,19,0.1)", margin: "40px 0 32px" }} />
 
           {/* Claim CTA */}
           <div style={{ background: "rgba(139,69,19,0.06)", borderRadius: 10, padding: "18px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>

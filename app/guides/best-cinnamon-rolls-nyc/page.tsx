@@ -6,7 +6,7 @@ import GuideSpotCard, { type GuideSpotData } from "@/components/GuideSpotCard";
 import { supabase } from "@/lib/supabase";
 import { locationSlug, toSlug } from "@/lib/location-slug";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "The Best Cinnamon Rolls in NYC (2026 Guide) | cinnamonrolls.nyc",
@@ -46,7 +46,7 @@ export default async function GuidePage() {
   const [{ data: locations }, countResult, { data: boroughCounts }] = await Promise.all([
     supabase
       .from("locations")
-      .select("id, name, display_name, neighborhood, borough, location_type, notes, google_rating, google_place_id, formatted_address, mentions")
+      .select("id, name, display_name, neighborhood, borough, location_type, notes, google_rating, google_place_id, formatted_address, mentions, photo_url, roll_style, frosting_types, gluten_free, dairy_free, vegan, price_approx")
       .eq("visible", true)
       .in("name", FEATURED_NAMES),
     supabase.from("locations").select("*", { count: "exact", head: true }).eq("visible", true),
@@ -67,22 +67,73 @@ export default async function GuidePage() {
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": "The Best Cinnamon Rolls in NYC (2026 Guide)",
-    "description": "The definitive guide to NYC's best cinnamon rolls — curated picks across all five boroughs.",
-    "url": "https://cinnamonrolls.nyc/guides/best-cinnamon-rolls-nyc",
-    "publisher": { "@type": "Organization", "name": "cinnamonrolls.nyc", "url": "https://cinnamonrolls.nyc", "logo": "https://cinnamonrolls.nyc/icon.png" },
-    "mainEntity": {
-      "@type": "ItemList",
-      "name": "Best Cinnamon Rolls in NYC",
-      "numberOfItems": featured.length,
-      "itemListElement": featured.map((l, i) => ({
-        "@type": "ListItem",
-        "position": i + 1,
-        "name": l.display_name ?? l.name,
-        "url": `https://cinnamonrolls.nyc/locations/${locationSlug(l.name)}`,
-      })),
-    },
+    "@graph": [
+      {
+        "@type": "Article",
+        "headline": "The Best Cinnamon Rolls in NYC (2026 Guide)",
+        "description": "The definitive guide to NYC's best cinnamon rolls — curated picks across all five boroughs.",
+        "url": "https://cinnamonrolls.nyc/guides/best-cinnamon-rolls-nyc",
+        "datePublished": "2025-01-01",
+        "dateModified": "2026-04-08",
+        "publisher": { "@type": "Organization", "name": "cinnamonrolls.nyc", "url": "https://cinnamonrolls.nyc", "logo": "https://cinnamonrolls.nyc/icon.png" },
+        "mainEntity": {
+          "@type": "ItemList",
+          "name": "Best Cinnamon Rolls in NYC",
+          "numberOfItems": featured.length,
+          "itemListElement": featured.map((l, i) => ({
+            "@type": "ListItem",
+            "position": i + 1,
+            "name": l.display_name ?? l.name,
+            "url": `https://cinnamonrolls.nyc/locations/${locationSlug(l.name)}`,
+          })),
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Map", "item": "https://cinnamonrolls.nyc" },
+          { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://cinnamonrolls.nyc/guides" },
+          { "@type": "ListItem", "position": 3, "name": "Best in NYC" },
+        ],
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the best cinnamon roll in NYC?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "NYC's most acclaimed cinnamon rolls include Benji's Buns (West Village, open until midnight), Radio Bakery (Greenpoint, Brooklyn), and L'Appartement 4F's laminated-dough swirl (West Village and Brooklyn Heights). Barachou in the West Village is a $5 roll that critics have called one of the best in the city.",
+            },
+          },
+          {
+            "@type": "Question",
+            "name": "Where can I find cinnamon rolls in NYC right now?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": `cinnamonrolls.nyc has mapped ${totalCount} spots across all five boroughs. Use the map to filter by neighborhood, type, and rating.`,
+            },
+          },
+          {
+            "@type": "Question",
+            "name": "What neighborhoods have the most cinnamon roll shops in NYC?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The West Village is the most concentrated cinnamon roll destination in NYC, with Benji's Buns, L'Appartement 4F, and Barachou all within a few blocks. Greenpoint and Prospect Heights in Brooklyn are also strong, anchored by Radio Bakery's two locations.",
+            },
+          },
+          {
+            "@type": "Question",
+            "name": "Are there Scandinavian-style cinnamon rolls in NYC?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Bakeri in Williamsburg is the city's most established Scandinavian cardamom roll spot. Ole & Steen, the Danish chain, has multiple NYC locations. Both serve cardamom-forward rolls with pearl sugar rather than American-style cream cheese frosting.",
+            },
+          },
+        ],
+      },
+    ],
   };
 
   return (
@@ -104,7 +155,7 @@ export default async function GuidePage() {
           {/* Hero */}
           <div style={{ marginBottom: 32 }}>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 16 }}>
-              <h1 style={{ fontSize: 34, fontWeight: 800, color: "var(--cr-brown-dark)", margin: 0, letterSpacing: "-0.03em", lineHeight: 1.15 }}>
+              <h1 style={{ fontSize: 26, fontWeight: 800, color: "var(--cr-brown-dark)", margin: 0, letterSpacing: "-0.02em", lineHeight: 1.15, whiteSpace: "nowrap" }}>
                 The Best Cinnamon Rolls in NYC
               </h1>
               <ShareButton
@@ -114,6 +165,7 @@ export default async function GuidePage() {
               />
             </div>
             <div style={{ height: 2, background: "rgba(139,69,19,0.12)", borderRadius: 1 }} />
+            <div style={{ fontSize: 12, color: "rgba(139,69,19,0.45)", marginTop: 8 }}>Updated April 2026</div>
           </div>
 
           {/* Article */}
@@ -160,26 +212,71 @@ export default async function GuidePage() {
             </div>
           </article>
 
-          {/* Also read — neighborhood guides */}
-          <div style={{ marginBottom: 40 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", color: "#9C6B3C", textTransform: "uppercase", margin: "0 0 12px" }}>
-              Neighborhood guides
-            </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {/* Neighborhood guides */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "8px 0 20px" }}>
+            <div style={{ flex: 1, height: 1, background: "rgba(139,69,19,0.12)" }} />
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", color: "#9C6B3C", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+              Explore by neighborhood
+            </span>
+            <div style={{ flex: 1, height: 1, background: "rgba(139,69,19,0.12)" }} />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 48 }}>
+            {[
+              { href: "/guides/best-cinnamon-rolls-west-village", label: "West Village" },
+              { href: "/guides/best-cinnamon-rolls-east-village", label: "East Village" },
+              { href: "/guides/best-cinnamon-rolls-greenpoint", label: "Greenpoint" },
+              { href: "/guides/best-cinnamon-rolls-williamsburg", label: "Williamsburg" },
+              { href: "/guides/best-cinnamon-rolls-prospect-heights", label: "Prospect Heights" },
+              { href: "/guides/best-cinnamon-rolls-brooklyn-heights", label: "Brooklyn Heights" },
+            ].map(({ href, label }) => (
+              <Link key={href} href={href} style={{ textDecoration: "none" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "14px 16px", background: "#fff", borderRadius: 10, border: "1px solid rgba(139,69,19,0.1)" }}>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: "var(--cr-brown-dark)" }}>{label}</span>
+                  <span style={{ fontSize: 14, color: "rgba(139,69,19,0.4)", flexShrink: 0 }}>→</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* FAQ */}
+          <section style={{ marginBottom: 48 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "0 0 20px" }}>
+              <div style={{ flex: 1, height: 1, background: "rgba(139,69,19,0.12)" }} />
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", color: "#9C6B3C", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                Common questions
+              </span>
+              <div style={{ flex: 1, height: 1, background: "rgba(139,69,19,0.12)" }} />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {[
-                { href: "/guides/best-cinnamon-rolls-west-village", label: "West Village" },
-                { href: "/guides/best-cinnamon-rolls-east-village", label: "East Village" },
-                { href: "/guides/best-cinnamon-rolls-greenpoint", label: "Greenpoint" },
-                { href: "/guides/best-cinnamon-rolls-williamsburg", label: "Williamsburg" },
-                { href: "/guides/best-cinnamon-rolls-prospect-heights", label: "Prospect Heights" },
-                { href: "/guides/best-cinnamon-rolls-brooklyn-heights", label: "Brooklyn Heights" },
-              ].map(({ href, label }) => (
-                <Link key={href} href={href} style={{ fontSize: 13, fontWeight: 600, padding: "6px 14px", borderRadius: 20, background: "#fff", color: "var(--cr-brown)", border: "1px solid rgba(139,69,19,0.2)", textDecoration: "none" }}>
-                  {label}
-                </Link>
+                {
+                  q: "What is the best cinnamon roll in NYC?",
+                  a: "The most acclaimed spots right now are Benji's Buns (West Village), Radio Bakery (Greenpoint and Prospect Heights), and L'Appartement 4F (West Village and Brooklyn Heights). Barachou in the West Village is a $5 roll that Carboholic rated 9.7 — one of the highest scores ever.",
+                },
+                {
+                  q: "What neighborhoods have the most cinnamon roll shops?",
+                  a: "The West Village is the most concentrated destination, with Benji's Buns, L'Appartement 4F, and Barachou all within a few blocks. Greenpoint and Prospect Heights in Brooklyn are the strongest outer-borough options, both anchored by Radio Bakery.",
+                },
+                {
+                  q: "Are there Scandinavian-style cinnamon rolls in NYC?",
+                  a: "Yes. Bakeri in Williamsburg serves cardamom-forward rolls with pearl sugar in the Norwegian tradition. Ole & Steen, the Danish chain, has multiple NYC locations. Both are noticeably less sweet than the American style.",
+                },
+                {
+                  q: "How much does a cinnamon roll cost in NYC?",
+                  a: "Prices range from $5 (Barachou) to $9–$10 (Benji's Buns, Spirals). Most spots are $6–$8. Radio Bakery is $6.50, L'Appartement 4F is $8, and Ole & Steen is $6.65.",
+                },
+              ].map(({ q, a }) => (
+                <details key={q} style={{ background: "#fff", borderRadius: 10, border: "1px solid rgba(139,69,19,0.1)", padding: "14px 18px" }}>
+                  <summary style={{ fontSize: 14, fontWeight: 700, color: "var(--cr-brown-dark)", cursor: "pointer", listStyle: "none", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                    {q}
+                    <span style={{ fontSize: 18, color: "rgba(139,69,19,0.35)", flexShrink: 0 }}>+</span>
+                  </summary>
+                  <p style={{ fontSize: 14, color: "#5a3a1a", lineHeight: 1.7, margin: "12px 0 0" }}>{a}</p>
+                </details>
               ))}
             </div>
-          </div>
+          </section>
 
           {/* CTA */}
           <div style={{ background: "var(--cr-brown)", borderRadius: 12, padding: "24px", textAlign: "center" }}>

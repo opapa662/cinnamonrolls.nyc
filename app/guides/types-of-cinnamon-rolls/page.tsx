@@ -104,12 +104,40 @@ interface SpotRow extends GuideSpotData {
   vegan: boolean;
 }
 
+const typesJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "headline": "Types of Cinnamon Rolls — A Guide",
+      "description": "Classic American, Scandinavian, sourdough, laminated — a guide to the main styles of cinnamon rolls and where to find each one in NYC.",
+      "url": "https://cinnamonrolls.nyc/guides/types-of-cinnamon-rolls",
+      "datePublished": "2025-03-01",
+      "dateModified": "2026-04-08",
+      "publisher": {
+        "@type": "Organization",
+        "name": "cinnamonrolls.nyc",
+        "url": "https://cinnamonrolls.nyc",
+        "logo": "https://cinnamonrolls.nyc/icon.png",
+      },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Map", "item": "https://cinnamonrolls.nyc" },
+        { "@type": "ListItem", "position": 2, "name": "NYC Guide", "item": "https://cinnamonrolls.nyc/guides/best-cinnamon-rolls-nyc" },
+        { "@type": "ListItem", "position": 3, "name": "Types of Cinnamon Rolls" },
+      ],
+    },
+  ],
+};
+
 export default async function TypesGuidePage() {
   const [{ data: locations }, countResult] = await Promise.all([
     supabase
       .from("locations")
       .select(
-        "id, name, display_name, neighborhood, borough, location_type, notes, google_rating, google_place_id, formatted_address, mentions, roll_style, frosting_type, gluten_free, dairy_free, vegan"
+        "id, name, display_name, neighborhood, borough, location_type, notes, google_rating, google_place_id, formatted_address, mentions, roll_style, frosting_type, gluten_free, dairy_free, vegan, price_approx"
       )
       .eq("visible", true),
     supabase.from("locations").select("*", { count: "exact", head: true }).eq("visible", true),
@@ -156,6 +184,7 @@ export default async function TypesGuidePage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--cr-cream)", fontFamily: "var(--font-inter), -apple-system, sans-serif" }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(typesJsonLd) }} />
       <Header count={count} backLink />
 
       <div style={{ paddingTop: "60px", paddingBottom: "80px" }}>
@@ -178,9 +207,10 @@ export default async function TypesGuidePage() {
             <h1 style={{ fontSize: 40, fontWeight: 800, color: "var(--cr-brown-dark)", letterSpacing: "-0.03em", lineHeight: 1.1, margin: "0 0 14px" }}>
               Types of Cinnamon Rolls
             </h1>
-            <p style={{ fontSize: 17, color: "#7A4010", lineHeight: 1.7, margin: "0 0 20px", maxWidth: 580 }}>
+            <p style={{ fontSize: 17, color: "#7A4010", lineHeight: 1.7, margin: "0 0 8px", maxWidth: 580 }}>
               Not all cinnamon rolls are created equal. From the big gooey American classic to the cardamom-spiced Scandinavian kanelbulle, each style has a distinct philosophy — different dough, different technique, different occasion.
             </p>
+            <div style={{ fontSize: 12, color: "rgba(139,69,19,0.45)", marginBottom: 16 }}>Updated April 2026</div>
             {/* Style chips */}
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {ROLL_STYLES.map((rs) => {

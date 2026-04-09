@@ -13,6 +13,7 @@ export interface LocationRowData {
   google_place_id: string | null;
   formatted_address: string | null;
   mentions: string[] | null;
+  price_approx?: string | null;
 }
 
 interface Props {
@@ -108,8 +109,13 @@ export default function LocationRow({ loc, showNeighborhood = true }: Props) {
         )}
       </div>
 
-      {/* Rating → Google Maps, arrow → bakery page */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+      {/* Price + Rating → Google Maps, arrow → bakery page */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+        {loc.price_approx && (
+          <span style={{ fontSize: 12, fontWeight: 600, color: "#7a3e0a", background: "rgba(196,132,58,0.1)", border: "1px solid rgba(196,132,58,0.25)", borderRadius: 20, padding: "1px 8px", whiteSpace: "nowrap" }}>
+            {loc.price_approx}
+          </span>
+        )}
         {loc.google_rating && (
           mapsUrl ? (
             <a

@@ -107,6 +107,37 @@ const NEIGHBORHOOD_GUIDES = [
   },
 ];
 
+const guidesJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "name": "NYC Cinnamon Roll Guides",
+      "description": "In-depth guides to the best cinnamon rolls in NYC — by borough and by neighborhood.",
+      "url": "https://cinnamonrolls.nyc/guides",
+      "dateModified": "2026-04-08",
+      "publisher": {
+        "@type": "Organization",
+        "name": "cinnamonrolls.nyc",
+        "url": "https://cinnamonrolls.nyc",
+        "logo": "https://cinnamonrolls.nyc/icon.png",
+      },
+      "hasPart": [
+        ...BOROUGH_GUIDES.map((g) => ({ "@type": "Article", "name": g.title, "url": `https://cinnamonrolls.nyc${g.href}` })),
+        ...NEIGHBORHOOD_GUIDES.map((g) => ({ "@type": "Article", "name": `Best Cinnamon Rolls in ${g.title}, NYC`, "url": `https://cinnamonrolls.nyc${g.href}` })),
+        { "@type": "Article", "name": "Types of Cinnamon Rolls", "url": "https://cinnamonrolls.nyc/guides/types-of-cinnamon-rolls" },
+      ],
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Map", "item": "https://cinnamonrolls.nyc" },
+        { "@type": "ListItem", "position": 2, "name": "Guides" },
+      ],
+    },
+  ],
+};
+
 export default async function GuidesIndexPage() {
   const { count } = await supabase
     .from("locations")
@@ -117,6 +148,7 @@ export default async function GuidesIndexPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--cr-cream)", fontFamily: "var(--font-inter), -apple-system, sans-serif" }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(guidesJsonLd) }} />
       <Header count={totalCount} backLink />
       <div style={{ paddingTop: 60 }}>
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "40px 24px 100px" }}>
@@ -188,6 +220,26 @@ export default async function GuidesIndexPage() {
                 </Link>
               ))}
             </div>
+          </section>
+
+          {/* Style guides */}
+          <section style={{ marginBottom: 52 }}>
+            <h2 style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.06em", color: "#9C6B3C", margin: "0 0 16px", textTransform: "uppercase" }}>
+              By Style
+            </h2>
+            <Link href="/guides/types-of-cinnamon-rolls" style={{ textDecoration: "none" }}>
+              <div style={{ background: "#fff", borderRadius: 10, border: "1px solid rgba(139,69,19,0.12)", padding: "18px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: "var(--cr-brown-dark)", marginBottom: 4 }}>
+                    Types of Cinnamon Rolls
+                  </div>
+                  <div style={{ fontSize: 13, color: "#7A4010", lineHeight: 1.5 }}>
+                    Classic American, Scandinavian, sourdough, laminated — what makes each style different and where to find each in NYC.
+                  </div>
+                </div>
+                <span style={{ fontSize: 16, color: "rgba(139,69,19,0.4)", flexShrink: 0 }}>→</span>
+              </div>
+            </Link>
           </section>
 
           {/* CTA */}

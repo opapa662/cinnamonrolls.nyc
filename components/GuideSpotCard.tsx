@@ -1,7 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
 import { locationSlug } from "@/lib/location-slug";
 import { cleanAddress } from "@/lib/address";
 
@@ -17,6 +14,13 @@ export interface GuideSpotData {
   google_place_id: string | null;
   formatted_address: string | null;
   mentions: string[] | null;
+  photo_url?: string | null;
+  roll_style?: string | null;
+  frosting_types?: string[] | null;
+  gluten_free?: boolean;
+  dairy_free?: boolean;
+  vegan?: boolean;
+  price_approx?: string | null;
 }
 
 interface Props {
@@ -25,7 +29,6 @@ interface Props {
 }
 
 export default function GuideSpotCard({ loc, showNeighborhood = true }: Props) {
-  const [hovered, setHovered] = useState(false);
   const displayName = loc.display_name ?? loc.name;
   const metaParts = [
     ...(showNeighborhood && loc.neighborhood ? [loc.neighborhood] : []),
@@ -38,36 +41,55 @@ export default function GuideSpotCard({ loc, showNeighborhood = true }: Props) {
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(displayName + " " + loc.formatted_address)}`
     : null;
 
+  const dietaryParts = [
+    ...(loc.gluten_free ? ["Gluten-free"] : []),
+    ...(loc.dairy_free  ? ["Dairy-free"] : []),
+    ...(loc.vegan       ? ["Vegan"] : []),
+  ];
+
   return (
     <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       style={{
         margin: "8px 0 28px",
-        padding: "16px 18px",
-        background: hovered ? "#fdf6ee" : "#fff",
+        background: "#fff",
         borderRadius: "0 10px 10px 0",
-        borderLeft: `3px solid rgba(196,132,58,${hovered ? "0.9" : "0.7"})`,
-        transition: "background 0.15s ease, border-color 0.15s ease",
+        borderLeft: "3px solid rgba(196,132,58,0.7)",
+        overflow: "hidden",
       }}
     >
-      {/* Name + rating */}
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, marginBottom: 4 }}>
+      {loc.photo_url && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={loc.photo_url}
+          alt={`${loc.display_name ?? loc.name} cinnamon roll`}
+          style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }}
+        />
+      )}
+      <div style={{ padding: "16px 18px" }}>
+      {/* Name + rating + price */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 4 }}>
         <Link
           href={`/locations/${locationSlug(loc.name)}`}
           style={{ fontSize: 19, fontWeight: 700, color: "var(--cr-brown-dark)", textDecoration: "none", lineHeight: 1.2 }}
         >
           {displayName}
         </Link>
-        {loc.google_rating && (
-          mapsUrl ? (
-            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "#9C6B3C", fontWeight: 500, flexShrink: 0, textDecoration: "none", whiteSpace: "nowrap" }}>
-              ⭐ {loc.google_rating.toFixed(1)}
-            </a>
-          ) : (
-            <span style={{ fontSize: 13, color: "#9C6B3C", fontWeight: 500, flexShrink: 0 }}>⭐ {loc.google_rating.toFixed(1)}</span>
-          )
-        )}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3, flexShrink: 0 }}>
+          {loc.google_rating && (
+            mapsUrl ? (
+              <a href={mapsUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "#9C6B3C", fontWeight: 500, textDecoration: "none", whiteSpace: "nowrap" }}>
+                ⭐ {loc.google_rating.toFixed(1)}
+              </a>
+            ) : (
+              <span style={{ fontSize: 13, color: "#9C6B3C", fontWeight: 500 }}>⭐ {loc.google_rating.toFixed(1)}</span>
+            )
+          )}
+          {loc.price_approx && (
+            <span style={{ fontSize: 12, fontWeight: 600, color: "#7a3e0a", background: "rgba(196,132,58,0.1)", border: "1px solid rgba(196,132,58,0.25)", borderRadius: 20, padding: "1px 8px", whiteSpace: "nowrap" }}>
+              {loc.price_approx}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Meta + address */}
@@ -94,14 +116,47 @@ export default function GuideSpotCard({ loc, showNeighborhood = true }: Props) {
         <p style={{ fontSize: 15, color: "#4a2e10", lineHeight: 1.75, margin: "0 0 12px" }}>{loc.notes}</p>
       )}
 
-      {/* Footer: mentions + CTA */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-        <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-          {loc.mentions?.map((m) => (
-            <span key={m} style={{ fontSize: 11, fontWeight: 600, padding: "2px 9px", borderRadius: 20, background: "rgba(139,69,19,0.07)", color: "#8B4513", border: "1px solid rgba(139,69,19,0.15)" }}>
-              {m}
-            </span>
-          ))}
+      {/* Footer: roll style + mentions + CTA — v2 */}
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {(loc.roll_style || (loc.frosting_types ?? []).length > 0 || dietaryParts.length > 0) && (
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#9C6B3C", marginBottom: 4 }}>
+                Roll Styles
+              </div>
+              <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+                {loc.roll_style && (
+                  <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 9px", borderRadius: 20, background: "rgba(196,132,58,0.1)", color: "#7a3e0a", border: "1px solid rgba(196,132,58,0.3)" }}>
+                    {loc.roll_style}
+                  </span>
+                )}
+                {(loc.frosting_types ?? []).map((f) => (
+                  <span key={f} style={{ fontSize: 11, fontWeight: 600, padding: "2px 9px", borderRadius: 20, background: "rgba(196,132,58,0.1)", color: "#7a3e0a", border: "1px solid rgba(196,132,58,0.3)" }}>
+                    {f}
+                  </span>
+                ))}
+                {dietaryParts.map((d) => (
+                  <span key={d} style={{ fontSize: 11, fontWeight: 600, padding: "2px 9px", borderRadius: 20, background: "#f0fdf4", color: "#15803d", border: "1px solid rgba(21,128,61,0.2)" }}>
+                    {d}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {(loc.mentions ?? []).length > 0 && (
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#9C6B3C", marginBottom: 4 }}>
+                Featured in
+              </div>
+              <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+                {loc.mentions?.map((m) => (
+                  <span key={m} style={{ fontSize: 11, fontWeight: 600, padding: "2px 9px", borderRadius: 20, background: "rgba(139,69,19,0.07)", color: "#8B4513", border: "1px solid rgba(139,69,19,0.15)" }}>
+                    {m}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         <Link
           href={`/locations/${locationSlug(loc.name)}`}
@@ -109,6 +164,7 @@ export default function GuideSpotCard({ loc, showNeighborhood = true }: Props) {
         >
           View details →
         </Link>
+      </div>
       </div>
     </div>
   );

@@ -42,6 +42,36 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
+  async redirects() {
+    return [
+      // Borough pages → guide equivalents
+      { source: "/boroughs/manhattan", destination: "/guides/best-cinnamon-rolls-manhattan", permanent: true },
+      { source: "/boroughs/brooklyn", destination: "/guides/best-cinnamon-rolls-brooklyn", permanent: true },
+      { source: "/boroughs/queens", destination: "/guides/best-cinnamon-rolls-queens", permanent: true },
+      { source: "/boroughs/:slug", destination: "/guides/best-cinnamon-rolls-nyc", permanent: true },
+      // Neighborhood pages with dedicated guides
+      { source: "/neighborhoods/west-village", destination: "/guides/best-cinnamon-rolls-west-village", permanent: true },
+      { source: "/neighborhoods/east-village", destination: "/guides/best-cinnamon-rolls-east-village", permanent: true },
+      { source: "/neighborhoods/greenpoint", destination: "/guides/best-cinnamon-rolls-greenpoint", permanent: true },
+      { source: "/neighborhoods/williamsburg", destination: "/guides/best-cinnamon-rolls-williamsburg", permanent: true },
+      { source: "/neighborhoods/prospect-heights", destination: "/guides/best-cinnamon-rolls-prospect-heights", permanent: true },
+      { source: "/neighborhoods/brooklyn-heights", destination: "/guides/best-cinnamon-rolls-brooklyn-heights", permanent: true },
+      // Other neighborhoods → borough guide
+      { source: "/neighborhoods/upper-west-side", destination: "/guides/best-cinnamon-rolls-manhattan", permanent: true },
+      { source: "/neighborhoods/lower-east-side", destination: "/guides/best-cinnamon-rolls-manhattan", permanent: true },
+      { source: "/neighborhoods/union-square", destination: "/guides/best-cinnamon-rolls-manhattan", permanent: true },
+      { source: "/neighborhoods/nomad", destination: "/guides/best-cinnamon-rolls-manhattan", permanent: true },
+      { source: "/neighborhoods/midtown", destination: "/guides/best-cinnamon-rolls-manhattan", permanent: true },
+      { source: "/neighborhoods/noho", destination: "/guides/best-cinnamon-rolls-manhattan", permanent: true },
+      { source: "/neighborhoods/tribeca", destination: "/guides/best-cinnamon-rolls-manhattan", permanent: true },
+      { source: "/neighborhoods/soho", destination: "/guides/best-cinnamon-rolls-manhattan", permanent: true },
+      { source: "/neighborhoods/south-slope", destination: "/guides/best-cinnamon-rolls-brooklyn", permanent: true },
+      { source: "/neighborhoods/bed-stuy", destination: "/guides/best-cinnamon-rolls-brooklyn", permanent: true },
+      { source: "/neighborhoods/park-slope", destination: "/guides/best-cinnamon-rolls-brooklyn", permanent: true },
+      { source: "/neighborhoods/astoria", destination: "/guides/best-cinnamon-rolls-queens", permanent: true },
+      { source: "/neighborhoods/:slug", destination: "/guides/best-cinnamon-rolls-nyc", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {
