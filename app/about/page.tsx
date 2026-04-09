@@ -1,13 +1,25 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import Header from "@/components/Header";
 import AboutClient from "./AboutClient";
 import { supabase } from "@/lib/supabase";
+
+export const metadata: Metadata = {
+  title: "About — cinnamonrolls.nyc",
+  description: "cinnamonrolls.nyc is an independent, curated map of NYC's best cinnamon roll spots. Learn about the project and get in touch.",
+  alternates: { canonical: "https://cinnamonrolls.nyc/about" },
+  openGraph: {
+    title: "About — cinnamonrolls.nyc",
+    description: "An independent, curated map of NYC's best cinnamon roll spots.",
+    url: "https://cinnamonrolls.nyc/about",
+  },
+};
 
 export default async function AboutPage() {
   const { count } = await supabase
     .from("locations")
     .select("*", { count: "exact", head: true })
-    .eq("status", "active");
+    .eq("visible", true);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--cr-cream)", fontFamily: "var(--font-inter), -apple-system, sans-serif" }}>

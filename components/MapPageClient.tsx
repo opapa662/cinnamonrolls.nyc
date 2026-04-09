@@ -8,6 +8,7 @@ import MobileActionBar from "@/components/MobileActionBar";
 import SearchPanel, { type Filters, EMPTY_FILTERS, hasActiveFilters } from "@/components/SearchPanel";
 import type { Location as MapLocation } from "@/components/Map";
 import type { Map as MapboxMap } from "mapbox-gl";
+import { trackEvent } from "@/lib/analytics";
 
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
@@ -72,7 +73,7 @@ function expandDaysOpen(daysOpen: string | null): Set<string> {
   return result.size > 0 ? result : new Set(DAYS_ORDERED);
 }
 
-function applyFilters(locations: SidebarLocation[], filters: Filters): SidebarLocation[] {
+function applyFilters(locations: MapLocation[], filters: Filters): MapLocation[] {
   return locations.filter((loc) => {
     if (filters.query) {
       const q = filters.query.toLowerCase();
@@ -86,6 +87,7 @@ function applyFilters(locations: SidebarLocation[], filters: Filters): SidebarLo
       const open = expandDaysOpen(loc.days_open);
       if (!filters.days.some((d) => open.has(d))) return false;
     }
+    if (filters.minRating !== null && (loc.google_rating === null || loc.google_rating < filters.minRating)) return false;
     return true;
   });
 }
@@ -103,6 +105,7 @@ export default function MapPageClient({ locations }: MapPageClientProps) {
   const clearUserMarkerRef = useRef<(() => void) | null>(null);
   const mobileSheetRef = useRef<MobileSheetHandle>(null);
 
+  const [mapLoaded, setMapLoaded] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
@@ -126,6 +129,17 @@ export default function MapPageClient({ locations }: MapPageClientProps) {
     }
     return () => { document.body.style.overflow = ""; };
   }, [searchOpen]);
+
+  // On desktop, update the map live as filters change while the panel is open
+  useEffect(() => {
+    if (!searchOpen || window.innerWidth < 768) return;
+    if (hasActiveFilters(filters)) {
+      fitToLocations(filteredLocations);
+    } else {
+      fitAllRef.current?.();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
 
   const toggleSave = useCallback((id: string) => {
     setSavedIds((prev) => {
@@ -163,19 +177,41 @@ export default function MapPageClient({ locations }: MapPageClientProps) {
       showPopupRef.current = showPopup;
       setUserMarkerRef.current = setUserMarker;
       clearUserMarkerRef.current = clearUserMarker;
+      setMapLoaded(true);
     },
     [],
   );
 
   const handleShowAll = useCallback(() => fitAllRef.current?.(), []);
 
+  const fitToLocations = useCallback((locs: SidebarLocation[]) => {
+    const map = mapRef.current;
+    if (!map || locs.length === 0) return;
+    if (locs.length === 1) {
+      map.flyTo({ center: [locs[0].longitude, locs[0].latitude], zoom: 14, duration: 600 });
+      return;
+    }
+    const lngs = locs.map((l) => l.longitude);
+    const lats = locs.map((l) => l.latitude);
+    const bounds: [[number, number], [number, number]] = [
+      [Math.min(...lngs), Math.min(...lats)],
+      [Math.max(...lngs), Math.max(...lats)],
+    ];
+    const isMobile = window.innerWidth < 768;
+    const padding = isMobile
+      ? { top: 80, bottom: 240, left: 40, right: 40 }
+      : { top: 80, bottom: 80, left: 80, right: 80 };
+    map.fitBounds(bounds, { padding, maxZoom: 12, duration: 600 });
+  }, []);
+
   // On mobile, push the pin below the true center so the popup card
   // clears the header (60px) and has breathing room above.
-  const flyOffset = (): [number, number] | undefined =>
-    typeof window !== "undefined" && window.innerWidth < 768 ? [0, 110] : undefined;
+  const flyOffset = (): [number, number] =>
+    typeof window !== "undefined" && window.innerWidth < 768 ? [0, 110] : [0, 0];
 
   const handleSelectLocation = useCallback((loc: SidebarLocation) => {
     setSelectedId(loc.id);
+    trackEvent("card_clicked", { bakery_id: loc.id, bakery_name: loc.name });
     const map = mapRef.current;
     if (!map) return;
     map.flyTo({ center: [loc.longitude, loc.latitude], zoom: 14, duration: 600, offset: flyOffset() });
@@ -187,6 +223,8 @@ export default function MapPageClient({ locations }: MapPageClientProps) {
     if (!locations.length) return;
     const loc = locations[Math.floor(Math.random() * locations.length)];
     setSelectedId(loc.id);
+    setNearbyError(null);
+    trackEvent("surprise_me_clicked", { bakery_id: loc.id, bakery_name: loc.name });
     mapRef.current?.flyTo({ center: [loc.longitude, loc.latitude], zoom: 14, duration: 800, offset: flyOffset() });
     setTimeout(() => showPopupRef.current?.(loc.id), 850);
     mobileSheetRef.current?.collapse();
@@ -199,6 +237,7 @@ export default function MapPageClient({ locations }: MapPageClientProps) {
       setNearbyRadius(null);
       setNearbyError(null);
       clearUserMarkerRef.current?.();
+      fitAllRef.current?.();
       mobileSheetRef.current?.peek();
       return;
     }
@@ -208,9 +247,12 @@ export default function MapPageClient({ locations }: MapPageClientProps) {
       return;
     }
 
+    trackEvent("geolocation_requested");
+
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const { latitude: lat, longitude: lng } = pos.coords;
+        const { latitude: lat, longitude: lng, accuracy } = pos.coords;
+        trackEvent("geolocation_success", { accuracy_meters: Math.round(accuracy) });
         const { results, radius } = getNearby(locations, lat, lng);
         setUserCoords({ lat, lng });
         setNearbyMode(true);
@@ -223,10 +265,15 @@ export default function MapPageClient({ locations }: MapPageClientProps) {
         mapRef.current?.flyTo({ center: [lng, lat], zoom: 14, duration: 800 });
         setUserMarkerRef.current?.(lat, lng);
       },
-      () => {
-        setNearbyError("Location access denied. Please enable location services and try again.");
+      (err) => {
+        trackEvent("geolocation_denied", { error_code: err.code });
+        if (err.code === err.PERMISSION_DENIED) {
+          setNearbyError("Location access denied. Please enable location services and try again.");
+        } else {
+          setNearbyError("Couldn't get your location. Please try again.");
+        }
       },
-      { timeout: 8000 },
+      { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false },
     );
   }, [nearbyMode, locations]);
 
@@ -243,16 +290,22 @@ export default function MapPageClient({ locations }: MapPageClientProps) {
         mapRef.current?.flyTo({ center: [lng, lat], zoom: 14, duration: 800 });
         setUserMarkerRef.current?.(lat, lng);
       },
-      () => {
-        setNearbyError("Location access denied. Please enable location services and try again.");
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          setNearbyError("Location access denied. Please enable location services and try again.");
+        } else {
+          setNearbyError("Couldn't get your location. Please try again.");
+        }
       },
-      { timeout: 8000 },
+      { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false },
     );
   }, [locations]);
 
   const toggleSavedMode = () => {
     const willBeActive = !savedMode;
     setSavedMode(willBeActive);
+    setNearbyError(null);
+    trackEvent("saved_mode_toggled", { active: willBeActive });
     if (nearbyMode) { setNearbyMode(false); setUserCoords(null); clearUserMarkerRef.current?.(); }
     if (willBeActive) mobileSheetRef.current?.expand();
     else mobileSheetRef.current?.peek();
@@ -295,7 +348,7 @@ export default function MapPageClient({ locations }: MapPageClientProps) {
       <div className="desktop-sidebar">
         <Sidebar
           {...sharedSidebarProps}
-          onSearchOpen={() => setSearchOpen((o) => !o)}
+          onSearchOpen={() => { if (!searchOpen) trackEvent("search_opened"); setSearchOpen((o) => !o); }}
           onSurpriseMe={handleSurpriseMe}
           onToggleSavedMode={toggleSavedMode}
           onNearbyClick={handleNearbyClick}
@@ -304,8 +357,19 @@ export default function MapPageClient({ locations }: MapPageClientProps) {
       </div>
 
       <div style={{ flex: 1, position: "relative" }}>
+        {!mapLoaded && (
+          <div style={{
+            position: "absolute", inset: 0, zIndex: 10,
+            background: "var(--cr-cream)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontFamily: "var(--font-inter), -apple-system, sans-serif",
+          }}>
+            <div style={{ fontSize: 13, color: "#9C6B3C", fontWeight: 500 }}>Loading map…</div>
+          </div>
+        )}
         <Map
           locations={locations}
+          filteredIds={isFiltered ? new Set(filteredLocations.map((l) => l.id)) : null}
           onMapReady={handleMapReady}
           onPinClick={() => mobileSheetRef.current?.collapse()}
           savedIds={savedIds}
@@ -328,9 +392,11 @@ export default function MapPageClient({ locations }: MapPageClientProps) {
           onNearbyClick={handleNearbyClick}
           onSearchOpen={() => {
             const opening = !searchOpen;
+            if (opening) trackEvent("search_opened");
             setSearchOpen((o) => !o);
             if (opening) {
               setSavedMode(false);
+              setNearbyError(null);
               mobileSheetRef.current?.collapse();
             } else {
               mobileSheetRef.current?.peek();
@@ -345,7 +411,22 @@ export default function MapPageClient({ locations }: MapPageClientProps) {
         <SearchPanel
           filters={filters}
           onChange={setFilters}
-          onClose={() => { setSearchOpen(false); mobileSheetRef.current?.peek(); }}
+          onClose={() => {
+            setSearchOpen(false);
+            mobileSheetRef.current?.peek();
+            if (hasActiveFilters(filters)) {
+              trackEvent("filter_applied", {
+                query: filters.query || null,
+                boroughs: filters.boroughs.length ? filters.boroughs.join(",") : null,
+                types: filters.types.length ? filters.types.join(",") : null,
+                neighborhoods: filters.neighborhoods.length ? filters.neighborhoods.join(",") : null,
+                days: filters.days.length ? filters.days.join(",") : null,
+                min_rating: filters.minRating,
+                result_count: filteredLocations.length,
+              });
+              fitToLocations(filteredLocations);
+            }
+          }}
           locations={locations}
           filteredCount={filteredLocations.length}
         />

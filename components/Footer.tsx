@@ -15,7 +15,7 @@ export default function Footer() {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-end",
-        gap: 20,
+        gap: 10,
         paddingRight: 16,
         zIndex: 10,
         fontFamily: "var(--font-inter), -apple-system, sans-serif",

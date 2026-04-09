@@ -30,7 +30,7 @@ export default function SubmitForm() {
     supabase
       .from("locations")
       .select("id, name, display_name, neighborhood, borough")
-      .eq("status", "active")
+      .eq("visible", true)
       .order("name")
       .then(({ data }) => setLocations(data ?? []));
   }, []);
@@ -50,6 +50,7 @@ export default function SubmitForm() {
     });
 
     if (error) {
+      console.error("Submission error:", error);
       setError("Something went wrong. Please try again.");
       setLoading(false);
       return;
@@ -57,6 +58,7 @@ export default function SubmitForm() {
 
     setSubmitted(true);
     setLoading(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   if (submitted) {
@@ -82,7 +84,14 @@ export default function SubmitForm() {
   const isEdit = type === "edit";
 
   return (
-    <div style={{ maxWidth: 520, margin: "0 auto", padding: "48px 24px" }}>
+    <div className="submit-form-wrap" style={{ maxWidth: 520, margin: "0 auto", padding: "48px 24px" }}>
+      <Link
+        href="/"
+        style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "13px", color: "#9C6B3C", textDecoration: "none", fontWeight: 500, marginBottom: 16 }}
+        className="mobile-only"
+      >
+        ← Back to map
+      </Link>
       <h1 style={{ fontSize: "24px", fontWeight: 700, color: "var(--cr-brown-dark)", marginBottom: 8, letterSpacing: "-0.02em" }}>
         Add or edit a spot
       </h1>
@@ -132,11 +141,10 @@ export default function SubmitForm() {
             >
               <option value="">Select a location…</option>
               {locations.map((loc) => {
-                const label = loc.display_name || loc.name;
                 const sub = [loc.neighborhood, loc.borough].filter(Boolean).join(", ");
                 return (
                   <option key={loc.id} value={loc.id}>
-                    {label}{sub ? ` - ${sub}` : ""}
+                    {loc.name}{sub ? ` - ${sub}` : ""}
                   </option>
                 );
               })}

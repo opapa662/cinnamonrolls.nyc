@@ -3,7 +3,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { LocationItem, RecentlyAddedItem, sectionLabel, type SidebarLocation } from "@/components/Sidebar";
 
-const PEEK_VISIBLE = 72; // handle (32) + count row (36) + 4px breathing room
+const PEEK_VISIBLE = 68; // handle (32) + count row (36)
 
 type Snap = "peek" | "full" | "collapsed";
 
@@ -182,8 +182,8 @@ const MobileBottomSheet = forwardRef<MobileSheetHandle, Props>(function MobileBo
           alignItems: "center",
           justifyContent: "center",
           cursor: "grab",
-          background: snap === "full" ? "#f5e6d3" : "var(--cr-cream)",
-          borderBottom: snap === "full" ? "1px solid rgba(139,69,19,0.1)" : "none",
+          background: "var(--cr-cream)",
+          borderBottom: "none",
           touchAction: "none",
         }}
         onTouchStart={handleTouchStart}
@@ -207,9 +207,9 @@ const MobileBottomSheet = forwardRef<MobileSheetHandle, Props>(function MobileBo
         display: "flex",
         alignItems: "center",
         padding: "0 14px",
-        borderBottom: "1px solid rgba(139,69,19,0.08)",
+        borderBottom: "none",
       }}>
-        <span style={{ fontSize: 12, fontWeight: 600, color: "#9C6B3C" }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: "#7a5228" }}>
           {nearbyMode
             ? (nearbyRadius != null ? `${filteredLocations.length} nearby rolls` : "Nearby rolls")
             : savedMode
@@ -218,33 +218,17 @@ const MobileBottomSheet = forwardRef<MobileSheetHandle, Props>(function MobileBo
         </span>
       </div>
 
-      {/* Scrollable content */}
-      <div ref={contentRef} style={{ flex: 1, overflowY: translateY < 20 ? "auto" : "hidden", paddingBottom: 80 }}>
-        {/* Recently Added */}
-        {!isFiltered && recentlyAdded.length > 0 && (
-          <div style={{ padding: "6px 12px 0" }}>
-            <div style={sectionLabel}>Recently Added</div>
-            <div style={{ borderRadius: 8, border: "1px solid rgba(139,69,19,0.1)", overflow: "hidden", background: "rgba(253,247,242,0.7)" }}>
-              {recentlyAdded.map((loc) => (
-                <RecentlyAddedItem
-                  key={loc.id}
-                  loc={loc}
-                  onClick={() => onSelectLocation(loc)}
-                  selected={selectedId === loc.id}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* List header */}
+      {/* Mode header — pinned above scroll, visible whenever nearby/saved/filtered */}
+      {(nearbyMode || savedMode || isFiltered) && (
         <div style={{
+          flexShrink: 0,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "12px 14px 8px",
-          marginTop: isFiltered ? 0 : 10,
-          borderTop: isFiltered ? "none" : "2px solid rgba(139,69,19,0.18)",
+          padding: "8px 14px",
+          borderTop: "1px solid rgba(139,69,19,0.1)",
+          borderBottom: "1px solid rgba(139,69,19,0.08)",
+          background: "var(--cr-cream)",
         }}>
           <span style={sectionLabel}>
             {nearbyMode
@@ -267,7 +251,7 @@ const MobileBottomSheet = forwardRef<MobileSheetHandle, Props>(function MobileBo
                 onClick={nearbyMode ? onNearbyClick : onToggleSavedMode}
                 style={{ fontSize: 11, color: "#9C6B3C", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "inherit" }}
               >
-                Close ×
+                {nearbyMode ? "Clear ×" : "Close ×"}
               </button>
             )}
             {isFiltered && !nearbyMode && !savedMode && (
@@ -275,14 +259,32 @@ const MobileBottomSheet = forwardRef<MobileSheetHandle, Props>(function MobileBo
                 onClick={onClearAll}
                 style={{ fontSize: 11, color: "#9C6B3C", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "inherit" }}
               >
-                Show all ×
+                Clear filters ×
               </button>
             )}
           </div>
         </div>
+      )}
+
+      {/* Scrollable content */}
+      <div ref={contentRef} style={{ flex: 1, overflowY: translateY < 20 ? "auto" : "hidden", paddingBottom: 80 }}>
+        {/* Recently Added */}
+        {!isFiltered && recentlyAdded.length > 0 && (
+          <div style={{ padding: "10px 14px 0" }}>
+            <div style={sectionLabel}>Recently Added</div>
+            {recentlyAdded.map((loc) => (
+              <RecentlyAddedItem
+                key={loc.id}
+                loc={loc}
+                onClick={() => onSelectLocation(loc)}
+                selected={false}
+              />
+            ))}
+          </div>
+        )}
 
         {nearbyError && (
-          <div style={{ padding: "0 14px 12px", fontSize: 12, color: "#9C6B3C" }}>{nearbyError}</div>
+          <div style={{ padding: "12px 14px 4px", fontSize: 12, color: "#9C6B3C" }}>{nearbyError}</div>
         )}
 
         {filteredLocations.length === 0 ? (
@@ -297,7 +299,7 @@ const MobileBottomSheet = forwardRef<MobileSheetHandle, Props>(function MobileBo
               onClick={() => onSelectLocation(loc)}
               saved={savedIds.has(loc.id)}
               onToggleSave={onToggleSave}
-              selected={selectedId === loc.id}
+              selected={false}
               distanceMiles={distances?.get(loc.id)}
             />
           ))

@@ -7,6 +7,7 @@ export default function AboutClient() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [honeypot, setHoneypot] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
@@ -15,6 +16,13 @@ export default function AboutClient() {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    // Honeypot: bots fill hidden fields, humans don't
+    if (honeypot) {
+      setSubmitted(true);
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase.from("contact_submissions").insert({
       name: name.trim() || null,
@@ -35,7 +43,6 @@ export default function AboutClient() {
   if (submitted) {
     return (
       <div style={{ padding: "24px", background: "#fff", borderRadius: 10, border: "1px solid rgba(139,69,19,0.15)", textAlign: "center" }}>
-        <div style={{ fontSize: 22, marginBottom: 10 }}>🍥</div>
         <div style={{ fontSize: 15, fontWeight: 600, color: "var(--cr-brown-dark)", marginBottom: 6 }}>Message received!</div>
         <div style={{ fontSize: 13, color: "#9C6B3C" }}>Thanks for reaching out — we&apos;ll be in touch.</div>
       </div>
@@ -44,6 +51,19 @@ export default function AboutClient() {
 
   return (
     <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+      {/* Honeypot — hidden from humans, bots fill it in */}
+      <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true">
+        <label htmlFor="cr_url">Website</label>
+        <input
+          id="cr_url"
+          name="cr_url"
+          type="text"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
       <div>
         <label style={labelStyle}>
           Name <span style={{ color: "#9C6B3C", fontWeight: 400 }}>(optional)</span>
@@ -104,6 +124,9 @@ export default function AboutClient() {
       >
         {loading ? "Sending…" : "Send message"}
       </button>
+      <p style={{ fontSize: 12, color: "var(--cr-brown-mid)", margin: 0, lineHeight: 1.5 }}>
+        Your email is only used to reply to your message. We&apos;ll never share it with anyone.
+      </p>
     </form>
   );
 }

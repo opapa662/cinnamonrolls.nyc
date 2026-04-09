@@ -16,6 +16,11 @@ body {
   color: var(--cr-brown-dark);
 }
 
+*:focus,
+*:focus-visible {
+  outline: none;
+}
+
 /* Mapbox popup overrides */
 .cr-popup .mapboxgl-popup-content {
   padding: 0;
@@ -53,12 +58,25 @@ body {
   .header-sub     { font-size: 9px; }
 }
 
+/* Search panel CTA — hidden on desktop, visible on mobile only */
+.search-panel-cta {
+  display: none;
+}
+@media (max-width: 767px) {
+  .search-panel-cta {
+    display: block;
+  }
+}
+
 /* Search panel positioning */
 .search-panel {
   position: fixed;
   top: 68px;
   right: 16px;
   width: 320px;
+  max-height: calc(100vh - 68px - 24px);
+  display: flex;
+  flex-direction: column;
 }
 
 @media (max-width: 767px) {
@@ -68,6 +86,8 @@ body {
     right: 8px;
     width: auto;
     border-radius: 12px;
+    /* action bar: bottom 24px + height 56px = 80px, plus 8px gap */
+    max-height: calc(100vh - 68px - 88px);
   }
 }
 
@@ -76,6 +96,8 @@ body {
   .desktop-sidebar { display: none !important; }
   .desktop-footer { display: none !important; }
   .back-to-map { display: none !important; }
+  .submit-form-wrap { padding-top: 28px !important; }
+  .submit-form-wrap .mobile-only { margin-bottom: 16px !important; }
 }
 @media (min-width: 768px) {
   .mobile-only { display: none !important; }

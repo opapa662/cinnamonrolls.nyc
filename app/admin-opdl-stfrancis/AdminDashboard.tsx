@@ -144,6 +144,7 @@ export default function AdminDashboard({ submissions, locations, locationCount, 
         </div>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
           <Link href="/admin-opdl-stfrancis/photos" style={{ fontSize: 13, color: "var(--cr-brown-mid)", textDecoration: "none" }}>Photos</Link>
+          <Link href="/admin-opdl-stfrancis/categorize" style={{ fontSize: 13, color: "var(--cr-brown-mid)", textDecoration: "none" }}>Categorize</Link>
           <Link href="/" style={{ fontSize: 13, color: "var(--cr-brown-mid)", textDecoration: "none" }}>← View site</Link>
           <button onClick={handleLogout} style={{ fontSize: 13, color: "var(--cr-brown-mid)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>Sign out</button>
         </div>

@@ -3,9 +3,13 @@
 import { useEffect, useRef } from "react";
 import type { Map as MapboxMap } from "mapbox-gl";
 import type { SidebarLocation } from "@/components/Sidebar";
+import { locationSlug } from "@/lib/location-slug";
+import { trackEvent, debounce } from "@/lib/analytics";
+import { cleanAddress } from "@/lib/address";
 
 const HEART_FILLED = `<svg width="20" height="20" viewBox="0 0 16 16" fill="#c0392b"><path d="M8 13.5S2 9.5 2 5.5C2 3.567 3.567 2 5.5 2c1 0 1.9.45 2.5 1.15C8.6 2.45 9.5 2 10.5 2 12.433 2 14 3.567 14 5.5c0 4-6 8-6 8Z"/></svg>`;
 const HEART_OUTLINE = `<svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M8 13.5S2 9.5 2 5.5C2 3.567 3.567 2 5.5 2c1 0 1.9.45 2.5 1.15C8.6 2.45 9.5 2 10.5 2 12.433 2 14 3.567 14 5.5c0 4-6 8-6 8Z" stroke="rgba(139,69,19,0.4)" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+const SHARE_ICON = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 1v9M5 4l3-3 3 3" stroke="#8b4513" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 8v5a1 1 0 001 1h8a1 1 0 001-1V8" stroke="#8b4513" stroke-width="1.5" stroke-linecap="round"/></svg>`;
 
 export interface Location extends SidebarLocation {
   notes: string | null;
@@ -15,6 +19,7 @@ export interface Location extends SidebarLocation {
   google_place_id: string | null;
   google_rating: number | null;
   google_hours: { weekday_text: string[] } | null;
+  formatted_address: string | null;
 }
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -54,7 +59,7 @@ function ensurePopupVisible(popup: import("mapbox-gl").Popup, map: MapboxMap) {
     const margin = 12;
     // Safe zone: below header (68px), above collapsed tray+action bar (116px) on mobile
     const safeTop    = 68 + margin;
-    const safeBottom = isMobile ? window.innerHeight - 116 - margin : window.innerHeight - margin;
+    const safeBottom = isMobile ? window.innerHeight - 148 - margin : window.innerHeight - 36 - margin;
     const safeLeft   = margin;
     const safeRight  = window.innerWidth - margin;
     let panX = 0;
@@ -73,6 +78,7 @@ function createPinElement(): HTMLElement {
     "width:42px;height:42px;cursor:pointer;display:flex;align-items:center;justify-content:center;";
   const img = document.createElement("img");
   img.src = "/icon.png";
+  img.alt = "";
   img.style.cssText = "width:32px;height:32px;object-fit:contain;";
   el.appendChild(img);
   return el;
@@ -100,6 +106,18 @@ function createPopupHTML(loc: Location, saved = false): string {
     ? `<div style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:13px;color:#5a3a1a;flex-wrap:wrap;">${metaParts.join("")}</div>`
     : "";
 
+  const mapsUrlForAddress = loc.google_place_id
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.name)}&query_place_id=${loc.google_place_id}`
+    : null;
+  const cleanedAddress = loc.formatted_address ? cleanAddress(loc.formatted_address) : null;
+  const addressHTML = cleanedAddress
+    ? `<div style="margin-top:8px;font-size:12px;color:#7a5230;">${
+        mapsUrlForAddress
+          ? `<a href="${mapsUrlForAddress}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;outline:none;">📍 ${cleanedAddress}</a>`
+          : `📍 ${cleanedAddress}`
+      }</div>`
+    : "";
+
   const sources = (loc.mentions ?? []).filter(Boolean);
   const featuredHTML = sources.length
     ? `<div style="margin-top:12px;">
@@ -120,7 +138,7 @@ function createPopupHTML(loc: Location, saved = false): string {
       </div>`
     : "";
 
-  const saveBtn = `<button class="cr-popup-save" data-id="${loc.id}" style="background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0;line-height:1;margin-top:-2px;">${saved ? HEART_FILLED : HEART_OUTLINE}</button>`;
+  const saveBtn = `<button class="cr-popup-save" data-id="${loc.id}" aria-label="${saved ? "Remove from saved" : "Save"}" style="background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0;line-height:1;margin-top:-2px;outline:none;">${saved ? HEART_FILLED : HEART_OUTLINE}</button>`;
 
   return `<div style="padding:16px 18px;min-width:240px;max-width:300px;font-family:'Inter',sans-serif;">
     ${sub ? `<div style="font-size:10px;font-weight:600;color:#9C6B3C;letter-spacing:0.06em;margin-bottom:4px;">${sub}</div>` : ""}
@@ -129,14 +147,20 @@ function createPopupHTML(loc: Location, saved = false): string {
       ${saveBtn}
     </div>
     ${metaHTML}
+    ${addressHTML}
     ${loc.notes ? `<div style="margin-top:10px;font-size:13px;color:#5a3a1a;line-height:1.6;">${loc.notes}</div>` : ""}
     ${featuredHTML}
     ${linksHTML}
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(139,69,19,0.1);display:flex;align-items:center;justify-content:space-between;">
+      <a href="/locations/${locationSlug(loc.name)}" style="font-size:12px;font-weight:600;color:#8B4513;text-decoration:none;">View details →</a>
+      <button class="cr-popup-share" data-url="https://cinnamonrolls.nyc/locations/${locationSlug(loc.name)}" data-title="${displayName} — cinnamonrolls.nyc" aria-label="Share" style="background:none;border:none;cursor:pointer;padding:4px;line-height:1;display:flex;align-items:center;gap:5px;font-size:12px;color:#8b4513;font-weight:500;outline:none;">${SHARE_ICON} Share</button>
+    </div>
   </div>`;
 }
 
 interface MapProps {
   locations: Location[];
+  filteredIds?: Set<string> | null;
   onPinClick?: (id: string) => void;
   savedIds?: Set<string>;
   onToggleSave?: (id: string) => void;
@@ -149,7 +173,7 @@ interface MapProps {
   ) => void;
 }
 
-export default function Map({ locations, onMapReady, onPinClick, savedIds, onToggleSave }: MapProps) {
+export default function Map({ locations, filteredIds, onMapReady, onPinClick, savedIds, onToggleSave }: MapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapboxMap | null>(null);
   const initializedRef = useRef(false);
@@ -157,6 +181,7 @@ export default function Map({ locations, onMapReady, onPinClick, savedIds, onTog
   const popupsRef = useRef<globalThis.Map<string, import("mapbox-gl").Popup>>(new globalThis.Map());
   const userMarkerRef = useRef<import("mapbox-gl").Marker | null>(null);
   const locationsMapRef = useRef<globalThis.Map<string, Location>>(new globalThis.Map());
+  const popupOpenTimesRef = useRef<globalThis.Map<string, number>>(new globalThis.Map());
   const savedIdsRef = useRef<Set<string>>(new Set());
   savedIdsRef.current = savedIds ?? new Set();
   const onToggleSaveRef = useRef(onToggleSave);
@@ -171,6 +196,8 @@ export default function Map({ locations, onMapReady, onPinClick, savedIds, onTog
       mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
       if (!containerRef.current) return;
+
+      const mapLoadStart = Date.now();
 
       const map = new mapboxgl.Map({
         container: containerRef.current,
@@ -195,8 +222,90 @@ export default function Map({ locations, onMapReady, onPinClick, savedIds, onTog
         btn.innerHTML = wasSaved ? HEART_OUTLINE : HEART_FILLED;
       });
 
+      // Delegated click handler for popup share buttons
+      containerRef.current?.addEventListener("click", (e) => {
+        const btn = (e.target as Element).closest<HTMLElement>(".cr-popup-share");
+        if (!btn) return;
+        e.stopPropagation();
+        const url = btn.dataset.url ?? "";
+        const title = btn.dataset.title ?? "";
+        if (navigator.share && navigator.canShare?.({ url, title })) {
+          navigator.share({ url, title }).catch(() => {});
+        } else {
+          navigator.clipboard.writeText(url).then(() => {
+            btn.textContent = "Copied!";
+            setTimeout(() => { btn.innerHTML = `${SHARE_ICON} Share`; }, 2000);
+          }).catch(() => {});
+        }
+      });
+
+      map.on("error", (e) => {
+        trackEvent("map_style_error", { error_message: e.error?.message ?? "unknown map error" });
+      });
+
       map.on("load", () => {
+        trackEvent("map_loaded", { load_time_ms: Date.now() - mapLoadStart });
+
         if (!locations?.length) return;
+
+        // Debounced zoom tracking
+        let lastZoom = map.getZoom();
+        map.on("zoomend", debounce(() => {
+          const newZoom = map.getZoom();
+          trackEvent("map_zoomed", {
+            zoom_level: Math.round(newZoom * 10) / 10,
+            zoom_direction: newZoom > lastZoom ? "in" : "out",
+          });
+          lastZoom = newZoom;
+        }, 500));
+
+        // Debounced pan tracking
+        map.on("moveend", debounce(() => {
+          const center = map.getCenter();
+          trackEvent("map_panned", {
+            center_lat: Math.round(center.lat * 10000) / 10000,
+            center_lng: Math.round(center.lng * 10000) / 10000,
+          });
+        }, 1000));
+
+        // Debounced bounds change tracking
+        map.on("moveend", debounce(() => {
+          const b = map.getBounds();
+          if (!b) return;
+          const ne = b.getNorthEast();
+          const sw = b.getSouthWest();
+          const visiblePinCount = locations.filter((loc) => {
+            const m = markersRef.current.get(loc.id);
+            return m && m.getLngLat && b.contains(m.getLngLat());
+          }).length;
+          trackEvent("map_bounds_changed", {
+            ne_lat: Math.round(ne.lat * 10000) / 10000,
+            ne_lng: Math.round(ne.lng * 10000) / 10000,
+            sw_lat: Math.round(sw.lat * 10000) / 10000,
+            sw_lng: Math.round(sw.lng * 10000) / 10000,
+            visible_pin_count: visiblePinCount,
+          });
+        }, 1000));
+
+        // Delegated popup link clicks
+        containerRef.current?.addEventListener("click", (e) => {
+          const link = (e.target as Element).closest<HTMLAnchorElement>(".cr-popup a[href]");
+          if (!link) return;
+          const href = link.href;
+          let linkType: "instagram" | "directions" | "website" | "other" = "other";
+          if (href.includes("instagram.com")) linkType = "instagram";
+          else if (href.includes("google.com/maps")) linkType = "directions";
+          else if (!href.includes(window.location.hostname)) linkType = "website";
+          let bakeryId = "";
+          let bakeryName = "";
+          popupsRef.current.forEach((p, id) => {
+            if (p.isOpen()) {
+              bakeryId = id;
+              bakeryName = locationsMapRef.current.get(id)?.name ?? "";
+            }
+          });
+          trackEvent("popup_link_clicked", { bakery_id: bakeryId, bakery_name: bakeryName, link_type: linkType, destination_url: href });
+        });
 
         const bounds = new mapboxgl.LngLatBounds();
 
@@ -205,11 +314,23 @@ export default function Map({ locations, onMapReady, onPinClick, savedIds, onTog
           bounds.extend([loc.longitude, loc.latitude]);
 
           const popup = new mapboxgl.Popup({
-            offset: 50,
+            offset: 30,
             closeButton: false,
             maxWidth: "300px",
             className: "cr-popup",
           }).setHTML(createPopupHTML(loc));
+
+          popup.on("open", () => {
+            popupOpenTimesRef.current.set(loc.id, Date.now());
+            trackEvent("popup_opened", { bakery_id: loc.id, bakery_name: loc.name });
+          });
+          popup.on("close", () => {
+            const openTime = popupOpenTimesRef.current.get(loc.id);
+            if (openTime) {
+              trackEvent("popup_closed", { bakery_id: loc.id, bakery_name: loc.name, time_open_ms: Date.now() - openTime });
+              popupOpenTimesRef.current.delete(loc.id);
+            }
+          });
 
           const el = createPinElement();
           const marker = new mapboxgl.Marker({ element: el })
@@ -218,6 +339,7 @@ export default function Map({ locations, onMapReady, onPinClick, savedIds, onTog
 
           el.addEventListener("click", () => {
             onPinClick?.(loc.id);
+            trackEvent("pin_clicked", { bakery_id: loc.id, bakery_name: loc.name, pin_lat: loc.latitude, pin_lng: loc.longitude });
             const isMobile = window.innerWidth < 768;
             map.flyTo({
               center: [loc.longitude, loc.latitude],
@@ -267,6 +389,13 @@ export default function Map({ locations, onMapReady, onPinClick, savedIds, onTog
           popupsRef.current.forEach((p) => { if (p.isOpen()) p.remove(); });
         });
 
+        // On mobile, close popup when the user starts panning the map
+        map.on("dragstart", () => {
+          if (window.innerWidth < 768) {
+            popupsRef.current.forEach((p) => { if (p.isOpen()) p.remove(); });
+          }
+        });
+
         const setUserMarker = (lat: number, lng: number) => {
           userMarkerRef.current?.remove();
           const el = document.createElement("div");
@@ -297,5 +426,22 @@ export default function Map({ locations, onMapReady, onPinClick, savedIds, onTog
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return <div ref={containerRef} style={{ position: "absolute", inset: 0 }} />;
+  // Show/hide markers when filteredIds changes
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    markersRef.current.forEach((marker, id) => {
+      if (!filteredIds || filteredIds.has(id)) {
+        if (!marker.getLngLat) return; // safety
+        marker.addTo(map);
+      } else {
+        marker.remove();
+        // close popup if its pin was hidden
+        const popup = popupsRef.current.get(id);
+        if (popup?.isOpen()) popup.remove();
+      }
+    });
+  }, [filteredIds]);
+
+  return <div ref={containerRef} role="application" aria-label="Interactive map of NYC cinnamon roll spots" style={{ position: "absolute", inset: 0 }} />;
 }

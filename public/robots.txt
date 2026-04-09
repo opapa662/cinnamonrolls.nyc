@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin-opdl-stfrancis/
+Disallow: /ig-generator/
+Disallow: /api/
+
+Sitemap: https://cinnamonrolls.nyc/sitemap.xml

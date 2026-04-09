@@ -195,6 +195,7 @@ export function LocationItem({
         onClick={(e) => { e.stopPropagation(); onToggleSave(loc.id); }}
         style={{ background: "none", border: "none", cursor: "pointer", padding: 8, flexShrink: 0, lineHeight: 1 }}
         title={saved ? "Remove from saved" : "Save"}
+        aria-label={saved ? "Remove from saved" : "Save"}
       >
         <Heart filled={saved} />
       </button>
@@ -304,7 +305,7 @@ export default function Sidebar({
               }}
             >
               {recentlyAdded.map((loc) => (
-                <RecentlyAddedItem key={loc.id} loc={loc} onClick={() => onSelectLocation(loc)} selected={selectedId === loc.id} />
+                <RecentlyAddedItem key={loc.id} loc={loc} onClick={() => onSelectLocation(loc)} selected={false} />
               ))}
 
             </div>
@@ -343,7 +344,7 @@ export default function Sidebar({
                 onClick={nearbyMode ? onNearbyClick : onToggleSavedMode}
                 style={{ fontSize: 11, color: "#9C6B3C", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "inherit" }}
               >
-                Close ×
+                {nearbyMode ? "Clear ×" : "Close ×"}
               </button>
             )}
             {!nearbyMode && !savedMode && (
@@ -356,7 +357,7 @@ export default function Sidebar({
                 onClick={onClearAll}
                 style={{ fontSize: 11, color: "#9C6B3C", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "inherit" }}
               >
-                Show all ×
+                Clear filters ×
               </button>
             )}
           </div>
@@ -376,7 +377,7 @@ export default function Sidebar({
                 onClick={() => onSelectLocation(loc)}
                 saved={savedIds.has(loc.id)}
                 onToggleSave={onToggleSave}
-                selected={selectedId === loc.id}
+                selected={false}
                 distanceMiles={distances?.get(loc.id)}
               />
             ))
@@ -393,5 +394,5 @@ export const sectionLabel: React.CSSProperties = {
   color: "#9C6B3C",
   textTransform: "uppercase",
   letterSpacing: "0.06em",
-  marginBottom: 6,
+  marginBottom: 8,
 };

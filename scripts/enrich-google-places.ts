@@ -59,7 +59,7 @@ async function main() {
   const { data: locations, error } = await supabase
     .from("locations")
     .select("id, name, display_name, latitude, longitude, google_place_id")
-    .eq("status", "active")
+    .eq("status", "open")
     .is("google_place_id", null)
     .order("name");
 
