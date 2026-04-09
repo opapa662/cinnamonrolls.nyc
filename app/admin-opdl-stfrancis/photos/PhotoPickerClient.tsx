@@ -320,65 +320,52 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
                     <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#9C6B3C", marginBottom: 8 }}>
                       Crop position
                     </div>
-                    <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
-                      {/* Clickable image to set focal point */}
-                      <div style={{ position: "relative", flexShrink: 0, cursor: "crosshair", borderRadius: 6, overflow: "hidden", border: "1px solid rgba(139,69,19,0.15)" }}
-                        onClick={(e) => {
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
-                          const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
-                          setPendingCrop((p) => ({ ...p, [loc.id]: `${x}% ${y}%` }));
-                        }}
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={state.photo_url} alt="" style={{ width: 240, height: 160, objectFit: "cover", display: "block", objectPosition: currentPos }} />
-                        {/* Focal point dot */}
-                        {(() => {
-                          const parts = currentPos.split(" ");
-                          const px = parseFloat(parts[0]) || 50;
-                          const py = parseFloat(parts[1]) || 50;
-                          return (
-                            <div style={{ position: "absolute", left: `${px}%`, top: `${py}%`, transform: "translate(-50%, -50%)", width: 16, height: 16, borderRadius: "50%", background: "rgba(255,255,255,0.9)", border: "2px solid #8B4513", boxShadow: "0 1px 4px rgba(0,0,0,0.4)", pointerEvents: "none" }} />
-                          );
-                        })()}
-                      </div>
-
-                      {/* Preview at card display size */}
-                      <div>
-                        <div style={{ fontSize: 10, color: "var(--cr-brown-mid)", marginBottom: 4 }}>Card preview</div>
-                        <div style={{ borderRadius: 6, overflow: "hidden", border: "1px solid rgba(139,69,19,0.15)" }}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={state.photo_url} alt="" style={{ width: 180, height: 120, objectFit: "cover", display: "block", objectPosition: currentPos }} />
-                        </div>
-                      </div>
-
-                      {/* Controls */}
-                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                        <div style={{ fontSize: 11, color: "var(--cr-brown-mid)" }}>
-                          Click the image to set focal point
-                        </div>
-                        <div style={{ fontSize: 12, fontWeight: 600, color: "var(--cr-brown-dark)", fontFamily: "monospace" }}>
-                          {currentPos}
-                        </div>
-                        {hasPendingCrop && (
-                          <div style={{ display: "flex", gap: 8 }}>
-                            <button
-                              onClick={() => saveCrop(loc)}
-                              disabled={isCropping}
-                              style={{ padding: "6px 16px", fontSize: 12, fontWeight: 700, background: "var(--cr-brown)", color: "#fff", border: "none", borderRadius: 6, cursor: isCropping ? "not-allowed" : "pointer", fontFamily: "inherit" }}
-                            >
-                              {isCropping ? "Saving…" : "Save crop"}
-                            </button>
-                            <button
-                              onClick={() => setPendingCrop((p) => { const n = { ...p }; delete n[loc.id]; return n; })}
-                              disabled={isCropping}
-                              style={{ padding: "6px 12px", fontSize: 12, fontWeight: 600, background: "#fff", color: "var(--cr-brown-mid)", border: "1.5px solid rgba(139,69,19,0.2)", borderRadius: 6, cursor: "pointer", fontFamily: "inherit" }}
-                            >
-                              Reset
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                    <div style={{ fontSize: 11, color: "var(--cr-brown-mid)", marginBottom: 8 }}>
+                      Click anywhere on the image to set the crop focus — this matches the exact card ratio on the site.
+                    </div>
+                    {/* Full-width card-ratio picker */}
+                    <div
+                      style={{ position: "relative", cursor: "crosshair", borderRadius: 6, overflow: "hidden", border: "1px solid rgba(139,69,19,0.15)", width: "100%" }}
+                      onClick={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+                        const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+                        setPendingCrop((p) => ({ ...p, [loc.id]: `${x}% ${y}%` }));
+                      }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={state.photo_url} alt="" style={{ width: "100%", height: 160, objectFit: "cover", display: "block", objectPosition: currentPos }} />
+                      {/* Focal point dot */}
+                      {(() => {
+                        const parts = currentPos.split(" ");
+                        const px = parseFloat(parts[0]) || 50;
+                        const py = parseFloat(parts[1]) || 50;
+                        return (
+                          <div style={{ position: "absolute", left: `${px}%`, top: `${py}%`, transform: "translate(-50%, -50%)", width: 18, height: 18, borderRadius: "50%", background: "rgba(255,255,255,0.9)", border: "2.5px solid #8B4513", boxShadow: "0 1px 4px rgba(0,0,0,0.5)", pointerEvents: "none" }} />
+                        );
+                      })()}
+                    </div>
+                    {/* Controls row */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "var(--cr-brown-dark)", fontFamily: "monospace" }}>{currentPos}</span>
+                      {hasPendingCrop && (
+                        <>
+                          <button
+                            onClick={() => saveCrop(loc)}
+                            disabled={isCropping}
+                            style={{ padding: "5px 16px", fontSize: 12, fontWeight: 700, background: "var(--cr-brown)", color: "#fff", border: "none", borderRadius: 6, cursor: isCropping ? "not-allowed" : "pointer", fontFamily: "inherit" }}
+                          >
+                            {isCropping ? "Saving…" : "Save crop"}
+                          </button>
+                          <button
+                            onClick={() => setPendingCrop((p) => { const n = { ...p }; delete n[loc.id]; return n; })}
+                            disabled={isCropping}
+                            style={{ padding: "5px 12px", fontSize: 12, fontWeight: 600, background: "#fff", color: "var(--cr-brown-mid)", border: "1.5px solid rgba(139,69,19,0.2)", borderRadius: 6, cursor: "pointer", fontFamily: "inherit" }}
+                          >
+                            Reset
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 )}
