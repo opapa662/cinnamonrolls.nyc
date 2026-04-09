@@ -46,7 +46,7 @@ export default async function GuidePage() {
   const [{ data: locations }, countResult, { data: boroughCounts }] = await Promise.all([
     supabase
       .from("locations")
-      .select("id, name, display_name, neighborhood, borough, location_type, notes, google_rating, google_place_id, formatted_address, mentions, photo_url, roll_style, frosting_types, gluten_free, dairy_free, vegan, price_approx")
+      .select("id, name, display_name, neighborhood, borough, location_type, notes, google_rating, google_place_id, formatted_address, mentions, photo_url, object_position, roll_style, frosting_types, gluten_free, dairy_free, vegan, price_approx")
       .eq("visible", true)
       .in("name", FEATURED_NAMES),
     supabase.from("locations").select("*", { count: "exact", head: true }).eq("visible", true),

@@ -12,12 +12,14 @@ interface LocationWithPhotos {
   google_photos: string[] | null;
   photo_url: string | null;
   photo_source: string | null;
+  object_position: string | null;
 }
 
 interface LocationState {
   google_photos: string[] | null;
   photo_url: string | null;
   photo_source: string | null;
+  object_position: string;
 }
 
 export default function PhotoPickerClient({ locations }: { locations: LocationWithPhotos[] }) {
@@ -26,6 +28,8 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
   const [loadingRefresh, setLoadingRefresh] = useState<Record<string, boolean>>({});
   const [loadingSelect, setLoadingSelect] = useState<Record<string, boolean>>({});
   const [loadingUpload, setLoadingUpload] = useState<Record<string, boolean>>({});
+  const [loadingCrop, setLoadingCrop] = useState<Record<string, boolean>>({});
+  const [pendingCrop, setPendingCrop] = useState<Record<string, string>>({});
   const [refreshAllProgress, setRefreshAllProgress] = useState<{ current: number; total: number } | null>(null);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
@@ -34,7 +38,31 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
       google_photos: loc.google_photos,
       photo_url: loc.photo_url,
       photo_source: loc.photo_source,
+      object_position: loc.object_position ?? "center center",
     };
+  }
+
+  async function saveCrop(loc: LocationWithPhotos) {
+    const pos = pendingCrop[loc.id];
+    if (!pos) return;
+    setLoadingCrop((p) => ({ ...p, [loc.id]: true }));
+    try {
+      const res = await fetch(`/api/admin-opdl-stfrancis/locations/${loc.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ object_position: pos }),
+      });
+      if (res.ok) {
+        setLocationStates((p) => ({ ...p, [loc.id]: { ...getState(loc), object_position: pos } }));
+        setPendingCrop((p) => { const n = { ...p }; delete n[loc.id]; return n; });
+      } else {
+        const d = await res.json().catch(() => ({}));
+        alert(`Save failed: ${d.error ?? res.status}`);
+      }
+    } catch {
+      alert("Network error");
+    }
+    setLoadingCrop((p) => ({ ...p, [loc.id]: false }));
   }
 
   const withPhoto = locations.filter((l) => getState(l).photo_url !== null).length;
@@ -184,7 +212,10 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
             const isRefreshing = loadingRefresh[loc.id];
             const isUploading = loadingUpload[loc.id];
             const isSelecting = loadingSelect[loc.id];
-            const isLoading = isRefreshing || isSelecting || isUploading;
+            const isCropping = loadingCrop[loc.id];
+            const isLoading = isRefreshing || isSelecting || isUploading || isCropping;
+            const currentPos = pendingCrop[loc.id] ?? state.object_position;
+            const hasPendingCrop = loc.id in pendingCrop;
             const googlePhotos = state.google_photos ?? [];
             const ownPhoto = state.photo_source === "own" ? state.photo_url : null;
 
@@ -280,6 +311,75 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
                         </div>
                       );
                     })}
+                  </div>
+                )}
+
+                {/* Focal point picker — shown when a photo is selected */}
+                {state.photo_url && (
+                  <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(139,69,19,0.08)" }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#9C6B3C", marginBottom: 8 }}>
+                      Crop position
+                    </div>
+                    <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
+                      {/* Clickable image to set focal point */}
+                      <div style={{ position: "relative", flexShrink: 0, cursor: "crosshair", borderRadius: 6, overflow: "hidden", border: "1px solid rgba(139,69,19,0.15)" }}
+                        onClick={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+                          const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+                          setPendingCrop((p) => ({ ...p, [loc.id]: `${x}% ${y}%` }));
+                        }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={state.photo_url} alt="" style={{ width: 240, height: 160, objectFit: "cover", display: "block", objectPosition: currentPos }} />
+                        {/* Focal point dot */}
+                        {(() => {
+                          const parts = currentPos.split(" ");
+                          const px = parseFloat(parts[0]) || 50;
+                          const py = parseFloat(parts[1]) || 50;
+                          return (
+                            <div style={{ position: "absolute", left: `${px}%`, top: `${py}%`, transform: "translate(-50%, -50%)", width: 16, height: 16, borderRadius: "50%", background: "rgba(255,255,255,0.9)", border: "2px solid #8B4513", boxShadow: "0 1px 4px rgba(0,0,0,0.4)", pointerEvents: "none" }} />
+                          );
+                        })()}
+                      </div>
+
+                      {/* Preview at card display size */}
+                      <div>
+                        <div style={{ fontSize: 10, color: "var(--cr-brown-mid)", marginBottom: 4 }}>Card preview</div>
+                        <div style={{ borderRadius: 6, overflow: "hidden", border: "1px solid rgba(139,69,19,0.15)" }}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={state.photo_url} alt="" style={{ width: 180, height: 120, objectFit: "cover", display: "block", objectPosition: currentPos }} />
+                        </div>
+                      </div>
+
+                      {/* Controls */}
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        <div style={{ fontSize: 11, color: "var(--cr-brown-mid)" }}>
+                          Click the image to set focal point
+                        </div>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: "var(--cr-brown-dark)", fontFamily: "monospace" }}>
+                          {currentPos}
+                        </div>
+                        {hasPendingCrop && (
+                          <div style={{ display: "flex", gap: 8 }}>
+                            <button
+                              onClick={() => saveCrop(loc)}
+                              disabled={isCropping}
+                              style={{ padding: "6px 16px", fontSize: 12, fontWeight: 700, background: "var(--cr-brown)", color: "#fff", border: "none", borderRadius: 6, cursor: isCropping ? "not-allowed" : "pointer", fontFamily: "inherit" }}
+                            >
+                              {isCropping ? "Saving…" : "Save crop"}
+                            </button>
+                            <button
+                              onClick={() => setPendingCrop((p) => { const n = { ...p }; delete n[loc.id]; return n; })}
+                              disabled={isCropping}
+                              style={{ padding: "6px 12px", fontSize: 12, fontWeight: 600, background: "#fff", color: "var(--cr-brown-mid)", border: "1.5px solid rgba(139,69,19,0.2)", borderRadius: 6, cursor: "pointer", fontFamily: "inherit" }}
+                            >
+                              Reset
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>

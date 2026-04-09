@@ -15,6 +15,7 @@ export interface GuideSpotData {
   formatted_address: string | null;
   mentions: string[] | null;
   photo_url?: string | null;
+  object_position?: string | null;
   roll_style?: string | null;
   frosting_types?: string[] | null;
   gluten_free?: boolean;
@@ -62,7 +63,7 @@ export default function GuideSpotCard({ loc, showNeighborhood = true }: Props) {
         <img
           src={loc.photo_url}
           alt={`${loc.display_name ?? loc.name} cinnamon roll`}
-          style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }}
+          style={{ width: "100%", height: 160, objectFit: "cover", objectPosition: loc.object_position ?? "center center", display: "block" }}
         />
       )}
       <div style={{ padding: "16px 18px" }}>
@@ -78,18 +79,18 @@ export default function GuideSpotCard({ loc, showNeighborhood = true }: Props) {
           <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, whiteSpace: "nowrap" }}>
             {loc.google_rating && (
               mapsUrl ? (
-                <a href={mapsUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "#9C6B3C", fontWeight: 500, textDecoration: "none" }}>
+                <a href={mapsUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "#9C6B3C", fontWeight: 600, textDecoration: "none" }}>
                   ⭐ {loc.google_rating.toFixed(1)}
                 </a>
               ) : (
-                <span style={{ fontSize: 13, color: "#9C6B3C", fontWeight: 500 }}>⭐ {loc.google_rating.toFixed(1)}</span>
+                <span style={{ fontSize: 13, color: "#9C6B3C", fontWeight: 600 }}>⭐ {loc.google_rating.toFixed(1)}</span>
               )
             )}
             {loc.google_rating && loc.price_approx && (
               <span style={{ fontSize: 12, color: "rgba(139,69,19,0.3)" }}>|</span>
             )}
             {loc.price_approx && (
-              <span style={{ fontSize: 13, fontWeight: 400, color: "#9C6B3C" }}>{loc.price_approx}</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#9C6B3C" }}>{loc.price_approx}</span>
             )}
           </div>
         )}

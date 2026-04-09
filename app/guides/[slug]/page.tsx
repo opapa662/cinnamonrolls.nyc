@@ -61,6 +61,7 @@ const GUIDE_LABELS: Record<string, string> = {
   "best-cinnamon-rolls-bed-stuy": "Bed-Stuy",
   "best-cinnamon-rolls-park-slope": "Park Slope",
   "best-cinnamon-rolls-south-slope": "South Slope",
+  "best-cinnamon-rolls-carroll-gardens": "Carroll Gardens",
 };
 
 const RELATED: Record<string, string[]> = {
@@ -76,6 +77,7 @@ const RELATED: Record<string, string[]> = {
   "best-cinnamon-rolls-bed-stuy": ["best-cinnamon-rolls-park-slope", "best-cinnamon-rolls-prospect-heights", "best-cinnamon-rolls-brooklyn"],
   "best-cinnamon-rolls-park-slope": ["best-cinnamon-rolls-south-slope", "best-cinnamon-rolls-brooklyn-heights", "best-cinnamon-rolls-brooklyn"],
   "best-cinnamon-rolls-south-slope": ["best-cinnamon-rolls-park-slope", "best-cinnamon-rolls-prospect-heights", "best-cinnamon-rolls-brooklyn"],
+  "best-cinnamon-rolls-carroll-gardens": ["best-cinnamon-rolls-park-slope", "best-cinnamon-rolls-brooklyn-heights", "best-cinnamon-rolls-brooklyn"],
 };
 
 const GUIDES: Record<string, GuideConfig> = {
@@ -437,6 +439,32 @@ const GUIDES: Record<string, GuideConfig> = {
     ],
   },
 
+  "best-cinnamon-rolls-carroll-gardens": {
+    neighborhood: "Carroll Gardens",
+    borough: "Brooklyn",
+    title: "The Best Cinnamon Rolls in Carroll Gardens, Brooklyn (2026 Guide)",
+    metaDescription:
+      "Winner's Carroll Gardens bakery is the neighborhood's standout — a daily-baked classic cream cheese swirl that doesn't need a gimmick. The full guide.",
+    twitterDescription:
+      "Winner's Carroll Gardens location — the best cinnamon rolls in Carroll Gardens, Brooklyn.",
+    sections: [
+      {
+        type: "text",
+        content: <>Carroll Gardens is not a neighborhood that makes a lot of noise about its food. The spots that matter here — <Link href="/locations/winner" style={il}>Winner</Link> chief among them — earned their reputation slowly, through daily consistency rather than press coverage. That's the right way to build a neighborhood bakery, and it shows.</>,
+      },
+      { type: "spot", name: "Winner" },
+      {
+        type: "text",
+        content: "Winner's Carroll Gardens location is the original — the one that set the standard before the Park Slope expansion. The roll here is a classic cream cheese swirl: soft, properly glazed, and not trying to be anything other than what it is. It's the kind of thing you come back for every week.",
+      },
+      {
+        type: "text",
+        content: "The neighborhood sits between Cobble Hill and Red Hook, residential enough that the bakeries here serve actual regulars rather than destination visitors. If you come on a Saturday morning, you'll be in line with people who've been coming for years. There's no better endorsement.",
+      },
+      { type: "more" },
+    ],
+  },
+
   // ── Dietary guides ────────────────────────────────────────────────────────
   "best-gluten-free-cinnamon-rolls-nyc": {
     dietary: "gluten_free" as const,
@@ -542,7 +570,7 @@ export default async function GuidePage({
 
   let query = supabase
     .from("locations")
-    .select("id, name, display_name, neighborhood, borough, location_type, notes, google_rating, google_place_id, formatted_address, mentions, photo_url, roll_style, frosting_types, gluten_free, dairy_free, vegan, price_approx")
+    .select("id, name, display_name, neighborhood, borough, location_type, notes, google_rating, google_place_id, formatted_address, mentions, photo_url, object_position, roll_style, frosting_types, gluten_free, dairy_free, vegan, price_approx")
     .eq("visible", true);
 
   if (guide.neighborhood) {

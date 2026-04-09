@@ -30,6 +30,7 @@ interface Location {
   latitude: number;
   longitude: number;
   photo_url: string | null;
+  object_position: string | null;
   roll_style: string | null;
   frosting_type: string | null;
   frosting_types: string[] | null;
@@ -42,7 +43,7 @@ interface Location {
 async function getLocations(): Promise<Location[]> {
   const { data } = await supabase
     .from("locations")
-    .select("id, name, display_name, neighborhood, borough, location_type, notes, website, instagram, mentions, days_open, google_rating, google_review_count, google_place_id, google_hours, formatted_address, latitude, longitude, photo_url, roll_style, frosting_type, frosting_types, gluten_free, dairy_free, vegan, price_approx")
+    .select("id, name, display_name, neighborhood, borough, location_type, notes, website, instagram, mentions, days_open, google_rating, google_review_count, google_place_id, google_hours, formatted_address, latitude, longitude, photo_url, object_position, roll_style, frosting_type, frosting_types, gluten_free, dairy_free, vegan, price_approx")
     .eq("visible", true);
   return data ?? [];
 }
@@ -287,7 +288,7 @@ export default async function LocationPage({ params }: { params: Promise<{ slug:
                     <img
                       src={loc.photo_url}
                       alt={`${loc.display_name ?? loc.name} cinnamon roll`}
-                      style={{ width: "100%", height: 220, objectFit: "cover", display: "block" }}
+                      style={{ width: "100%", height: 220, objectFit: "cover", objectPosition: loc.object_position ?? "center center", display: "block" }}
                     />
                   )}
                   <div style={{ padding: "18px 20px" }}>

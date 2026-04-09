@@ -6,7 +6,7 @@ export const revalidate = 0;
 export default async function PhotosPage() {
   const { data: rows } = await supabaseAdmin
     .from("locations")
-    .select("id, name, display_name, neighborhood, borough, google_place_id, google_photos, photo_url, photo_source")
+    .select("id, name, display_name, neighborhood, borough, google_place_id, google_photos, photo_url, photo_source, object_position")
     .order("name");
 
   const locations = (rows ?? []).map((loc) => {
