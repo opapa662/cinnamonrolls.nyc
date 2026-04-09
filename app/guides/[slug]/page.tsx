@@ -58,6 +58,9 @@ const GUIDE_LABELS: Record<string, string> = {
   "best-cinnamon-rolls-williamsburg": "Williamsburg",
   "best-cinnamon-rolls-prospect-heights": "Prospect Heights",
   "best-cinnamon-rolls-brooklyn-heights": "Brooklyn Heights",
+  "best-cinnamon-rolls-bed-stuy": "Bed-Stuy",
+  "best-cinnamon-rolls-park-slope": "Park Slope",
+  "best-cinnamon-rolls-south-slope": "South Slope",
 };
 
 const RELATED: Record<string, string[]> = {
@@ -69,7 +72,10 @@ const RELATED: Record<string, string[]> = {
   "best-cinnamon-rolls-greenpoint": ["best-cinnamon-rolls-williamsburg", "best-cinnamon-rolls-prospect-heights", "best-cinnamon-rolls-brooklyn"],
   "best-cinnamon-rolls-williamsburg": ["best-cinnamon-rolls-greenpoint", "best-cinnamon-rolls-brooklyn-heights", "best-cinnamon-rolls-brooklyn"],
   "best-cinnamon-rolls-prospect-heights": ["best-cinnamon-rolls-brooklyn-heights", "best-cinnamon-rolls-greenpoint", "best-cinnamon-rolls-brooklyn"],
-  "best-cinnamon-rolls-brooklyn-heights": ["best-cinnamon-rolls-prospect-heights", "best-cinnamon-rolls-williamsburg", "best-cinnamon-rolls-brooklyn"],
+  "best-cinnamon-rolls-brooklyn-heights": ["best-cinnamon-rolls-prospect-heights", "best-cinnamon-rolls-park-slope", "best-cinnamon-rolls-brooklyn"],
+  "best-cinnamon-rolls-bed-stuy": ["best-cinnamon-rolls-park-slope", "best-cinnamon-rolls-prospect-heights", "best-cinnamon-rolls-brooklyn"],
+  "best-cinnamon-rolls-park-slope": ["best-cinnamon-rolls-south-slope", "best-cinnamon-rolls-brooklyn-heights", "best-cinnamon-rolls-brooklyn"],
+  "best-cinnamon-rolls-south-slope": ["best-cinnamon-rolls-park-slope", "best-cinnamon-rolls-prospect-heights", "best-cinnamon-rolls-brooklyn"],
 };
 
 const GUIDES: Record<string, GuideConfig> = {
@@ -356,6 +362,81 @@ const GUIDES: Record<string, GuideConfig> = {
       { type: "more" },
     ],
   },
+  // ── Additional Brooklyn neighborhood guides ───────────────────────────────
+  "best-cinnamon-rolls-bed-stuy": {
+    neighborhood: "Bed-Stuy",
+    borough: "Brooklyn",
+    title: "The Best Cinnamon Rolls in Bed-Stuy, Brooklyn (2026 Guide)",
+    metaDescription:
+      "Welcome Home (NYT Bakery of the Year) and Dreams of Sugar — two very different Bed-Stuy cinnamon roll spots, both worth knowing. The full guide.",
+    twitterDescription:
+      "Welcome Home's NYT Bakery of the Year rolls and Dreams of Sugar's community-rooted bakes — Bed-Stuy's best cinnamon rolls.",
+    sections: [
+      {
+        type: "text",
+        content: "Bed-Stuy has two cinnamon roll spots that couldn't be more different — and that contrast is what makes the neighborhood interesting. One draws visitors from across the city. The other has never needed to.",
+      },
+      {
+        type: "text",
+        content: <>Welcome Home is the work of Billy Wright, previously head baker at <Link href="/locations/lappartement-4f" style={il}>L'Appartement 4F</Link> in the West Village. He opened here in December 2024 and the New York Times named it Bakery of the Year before it had been open twelve months. It sells out daily — closed Tuesdays, go early every other day.</>,
+      },
+      { type: "spot", name: "Welcome Home" },
+      {
+        type: "text",
+        content: "Dreams of Sugar sits at the other end of the spectrum: a mom-and-daughters operation with a loyal local following built entirely on word of mouth. It's the kind of bakery that doesn't need a press mention to fill the case — and hasn't.",
+      },
+      { type: "spot", name: "Dreams of Sugar" },
+      { type: "more" },
+    ],
+  },
+  "best-cinnamon-rolls-park-slope": {
+    neighborhood: "Park Slope",
+    borough: "Brooklyn",
+    title: "The Best Cinnamon Rolls in Park Slope, Brooklyn (2026 Guide)",
+    metaDescription:
+      "Winner's Park Slope flagship, Breadivore, and every cinnamon roll worth knowing in Park Slope, Brooklyn.",
+    twitterDescription:
+      "Winner's flagship and Breadivore — the best cinnamon rolls in Park Slope, Brooklyn.",
+    sections: [
+      {
+        type: "text",
+        content: "Park Slope's food culture rewards consistency — the spots that succeed here tend to do so over years, not months. The cinnamon roll scene reflects that: a small number of bakeries doing things properly, without a lot of fanfare.",
+      },
+      { type: "spot", name: "Winner" },
+      {
+        type: "text",
+        content: "Winner's Park Slope location is the flagship — the one that built the bakery's reputation for unfussy, well-executed pastry. Cream cheese frosting, proper technique, no gimmicks. The kind of roll you'd eat every weekend without getting tired of it.",
+      },
+      { type: "spot", name: "Breadivore" },
+      {
+        type: "text",
+        content: "Breadivore runs a limited daily bake, open Wednesday through Sunday. Worth knowing about for weekend mornings when you're in the neighborhood — a quieter option than the Prospect Heights crowds, with the same quality ceiling.",
+      },
+      { type: "more" },
+    ],
+  },
+  "best-cinnamon-rolls-south-slope": {
+    neighborhood: "South Slope",
+    borough: "Brooklyn",
+    title: "The Best Cinnamon Rolls in South Slope, Brooklyn (2026 Guide)",
+    metaDescription:
+      "Little Red Kitchen Bake Shop is South Slope's standout — a sell-out-fast bakery open Tuesday through Sunday, with preorder recommended. The full guide.",
+    twitterDescription:
+      "Little Red Kitchen Bake Shop — the best cinnamon rolls in South Slope, Brooklyn.",
+    sections: [
+      {
+        type: "text",
+        content: <>South Slope's cinnamon roll scene is anchored by one standout: <Link href="/locations/little-red-kitchen-bake-shop" style={il}>Little Red Kitchen Bake Shop</Link>. Open Tuesday through Sunday, selling out fast, with a strong enough local following that preordering online is the smarter move over showing up and hoping.</>,
+      },
+      { type: "spot", name: "Little Red Kitchen Bake Shop" },
+      {
+        type: "text",
+        content: "South Slope sits between Park Slope and Sunset Park — residential, quieter than its neighbors, with a food culture that runs on community rather than destination traffic. If you're making a trip specifically for the roll, check their Instagram first; availability can vary by day.",
+      },
+      { type: "more" },
+    ],
+  },
+
   // ── Dietary guides ────────────────────────────────────────────────────────
   "best-gluten-free-cinnamon-rolls-nyc": {
     dietary: "gluten_free" as const,

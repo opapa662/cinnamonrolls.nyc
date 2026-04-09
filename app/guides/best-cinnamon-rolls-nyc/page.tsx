@@ -6,7 +6,7 @@ import GuideSpotCard, { type GuideSpotData } from "@/components/GuideSpotCard";
 import { supabase } from "@/lib/supabase";
 import { locationSlug, toSlug } from "@/lib/location-slug";
 
-export const revalidate = 0;
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "The Best Cinnamon Rolls in NYC (2026 Guide) | cinnamonrolls.nyc",
@@ -231,6 +231,9 @@ export default async function GuidePage() {
               { href: "/guides/best-cinnamon-rolls-williamsburg", label: "Williamsburg" },
               { href: "/guides/best-cinnamon-rolls-prospect-heights", label: "Prospect Heights" },
               { href: "/guides/best-cinnamon-rolls-brooklyn-heights", label: "Brooklyn Heights" },
+              { href: "/guides/best-cinnamon-rolls-bed-stuy", label: "Bed-Stuy" },
+              { href: "/guides/best-cinnamon-rolls-park-slope", label: "Park Slope" },
+              { href: "/guides/best-cinnamon-rolls-south-slope", label: "South Slope" },
             ].map(({ href, label }) => (
               <Link key={href} href={href} style={{ textDecoration: "none" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "14px 16px", background: "#fff", borderRadius: 10, border: "1px solid rgba(139,69,19,0.1)" }}>

@@ -9,7 +9,7 @@ export interface LocationRow {
   neighborhood: string | null;
   borough: string | null;
   roll_style: string | null;
-  frosting_type: string | null;
+  frosting_types: string[] | null;
   gluten_free: boolean;
   dairy_free: boolean;
   vegan: boolean;
@@ -17,7 +17,7 @@ export interface LocationRow {
 
 interface FieldState {
   roll_style: string | null;
-  frosting_type: string | null;
+  frosting_types: string[];
   gluten_free: boolean;
   dairy_free: boolean;
   vegan: boolean;
@@ -38,7 +38,6 @@ const FROSTING_TYPES = [
   "Caramel Glaze",
   "Pearl Sugar",
   "Naked",
-  "Multiple",
 ];
 
 export default function CategorizeClient({ locations }: { locations: LocationRow[] }) {
@@ -49,7 +48,7 @@ export default function CategorizeClient({ locations }: { locations: LocationRow
   function getState(loc: LocationRow): FieldState {
     return states[loc.id] ?? {
       roll_style: loc.roll_style,
-      frosting_type: loc.frosting_type,
+      frosting_types: loc.frosting_types ?? [],
       gluten_free: loc.gluten_free,
       dairy_free: loc.dairy_free,
       vegan: loc.vegan,
@@ -65,7 +64,8 @@ export default function CategorizeClient({ locations }: { locations: LocationRow
         body: JSON.stringify(update),
       });
       if (res.ok) {
-        setStates((p) => ({ ...p, [id]: { ...getState(locations.find((l) => l.id === id)!), ...(p[id] ?? {}), ...update } }));
+        const loc = locations.find((l) => l.id === id)!;
+        setStates((p) => ({ ...p, [id]: { ...getState(loc), ...(p[id] ?? {}), ...update } }));
       } else {
         const d = await res.json().catch(() => ({}));
         alert(`Save failed: ${d.error ?? res.status}`);
@@ -85,7 +85,6 @@ export default function CategorizeClient({ locations }: { locations: LocationRow
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--cr-cream)", fontFamily: "var(--font-inter), -apple-system, sans-serif" }}>
-      {/* Header */}
       <header style={{ background: "#fff", borderBottom: "1px solid rgba(139,69,19,0.1)", padding: "0 24px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -97,7 +96,6 @@ export default function CategorizeClient({ locations }: { locations: LocationRow
       </header>
 
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "28px 24px" }}>
-        {/* Stats + filter */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
           <div style={{ fontSize: 13, color: "var(--cr-brown-mid)" }}>
             <span style={{ fontWeight: 600, color: "var(--cr-brown-dark)" }}>{categorized}</span> categorized ·{" "}
@@ -112,7 +110,6 @@ export default function CategorizeClient({ locations }: { locations: LocationRow
           </div>
         </div>
 
-        {/* Location rows */}
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {filtered.map((loc) => {
             const state = getState(loc);
@@ -120,23 +117,10 @@ export default function CategorizeClient({ locations }: { locations: LocationRow
             const sub = [loc.neighborhood, loc.borough].filter(Boolean).join(" · ");
 
             return (
-              <div
-                key={loc.id}
-                style={{
-                  background: "#fff",
-                  borderRadius: 12,
-                  padding: "14px 18px",
-                  border: "1px solid rgba(139,69,19,0.1)",
-                  opacity: isSaving ? 0.65 : 1,
-                  transition: "opacity 0.15s",
-                }}
-              >
-                {/* Name row */}
+              <div key={loc.id} style={{ background: "#fff", borderRadius: 12, padding: "14px 18px", border: "1px solid rgba(139,69,19,0.1)", opacity: isSaving ? 0.65 : 1, transition: "opacity 0.15s" }}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: "var(--cr-brown-dark)" }}>
-                      {loc.display_name || loc.name}
-                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: "var(--cr-brown-dark)" }}>{loc.display_name || loc.name}</div>
                     {sub && <div style={{ fontSize: 12, color: "var(--cr-brown-mid)", marginTop: 2 }}>{sub}</div>}
                   </div>
                   {state.roll_style && (
@@ -146,8 +130,7 @@ export default function CategorizeClient({ locations }: { locations: LocationRow
                   )}
                 </div>
 
-                {/* Fields */}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "flex-end" }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "flex-start" }}>
                   {/* Roll Style */}
                   <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 180 }}>
                     <label style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: "#9C6B3C" }}>Roll Style</label>
@@ -166,22 +149,32 @@ export default function CategorizeClient({ locations }: { locations: LocationRow
                     </select>
                   </div>
 
-                  {/* Frosting Type */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 160 }}>
-                    <label style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: "#9C6B3C" }}>Frosting</label>
-                    <select
-                      value={state.frosting_type ?? ""}
-                      disabled={isSaving}
-                      onChange={(e) => {
-                        const val = e.target.value || null;
-                        setStates((p) => ({ ...p, [loc.id]: { ...getState(loc), ...(p[loc.id] ?? {}), frosting_type: val } }));
-                        patch(loc.id, { frosting_type: val });
-                      }}
-                      style={{ padding: "6px 10px", fontSize: 13, border: "1.5px solid rgba(139,69,19,0.2)", borderRadius: 6, background: "#fff", fontFamily: "inherit", color: state.frosting_type ? "var(--cr-brown-dark)" : "rgba(139,69,19,0.4)", cursor: "pointer", outline: "none" }}
-                    >
-                      <option value="">— unset —</option>
-                      {FROSTING_TYPES.map((s) => <option key={s} value={s}>{s}</option>)}
-                    </select>
+                  {/* Frosting Types (multi-select checkboxes) */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <label style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: "#9C6B3C" }}>Frosting (select all that apply)</label>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px" }}>
+                      {FROSTING_TYPES.map((ft) => {
+                        const checked = state.frosting_types.includes(ft);
+                        return (
+                          <label key={ft} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 500, color: checked ? "var(--cr-brown-dark)" : "var(--cr-brown-mid)", cursor: "pointer", userSelect: "none" }}>
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              disabled={isSaving}
+                              onChange={(e) => {
+                                const next = e.target.checked
+                                  ? [...state.frosting_types, ft]
+                                  : state.frosting_types.filter((x) => x !== ft);
+                                setStates((p) => ({ ...p, [loc.id]: { ...getState(loc), ...(p[loc.id] ?? {}), frosting_types: next } }));
+                                patch(loc.id, { frosting_types: next });
+                              }}
+                              style={{ accentColor: "var(--cr-brown)", cursor: "pointer" }}
+                            />
+                            {ft}
+                          </label>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   {/* Dietary flags */}

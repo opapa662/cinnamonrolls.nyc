@@ -105,6 +105,30 @@ const NEIGHBORHOOD_GUIDES = [
     description:
       "Neighborhood institutions and quality-first spots — the best cinnamon rolls in Brooklyn Heights.",
   },
+  {
+    slug: "best-cinnamon-rolls-bed-stuy",
+    href: "/guides/best-cinnamon-rolls-bed-stuy",
+    title: "Bed-Stuy",
+    borough: "Brooklyn",
+    description:
+      "Welcome Home (NYT Bakery of the Year) and Dreams of Sugar — two very different spots that define the neighborhood.",
+  },
+  {
+    slug: "best-cinnamon-rolls-park-slope",
+    href: "/guides/best-cinnamon-rolls-park-slope",
+    title: "Park Slope",
+    borough: "Brooklyn",
+    description:
+      "Winner's flagship Park Slope location, Breadivore, and every cinnamon roll worth knowing in Park Slope.",
+  },
+  {
+    slug: "best-cinnamon-rolls-south-slope",
+    href: "/guides/best-cinnamon-rolls-south-slope",
+    title: "South Slope",
+    borough: "Brooklyn",
+    description:
+      "Little Red Kitchen Bake Shop — the neighborhood's standout, a sell-out-fast weekend bakery worth planning around.",
+  },
 ];
 
 const guidesJsonLd = {
@@ -230,16 +254,35 @@ export default async function GuidesIndexPage() {
             <Link href="/guides/types-of-cinnamon-rolls" style={{ textDecoration: "none" }}>
               <div style={{ background: "#fff", borderRadius: 10, border: "1px solid rgba(139,69,19,0.12)", padding: "18px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: "var(--cr-brown-dark)", marginBottom: 4 }}>
-                    Types of Cinnamon Rolls
-                  </div>
-                  <div style={{ fontSize: 13, color: "#7A4010", lineHeight: 1.5 }}>
-                    Classic American, Scandinavian, sourdough, laminated — what makes each style different and where to find each in NYC.
-                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: "var(--cr-brown-dark)", marginBottom: 4 }}>Types of Cinnamon Rolls</div>
+                  <div style={{ fontSize: 13, color: "#7A4010", lineHeight: 1.5 }}>Classic American, Scandinavian, sourdough, laminated — what makes each style different and where to find each in NYC.</div>
                 </div>
                 <span style={{ fontSize: 16, color: "rgba(139,69,19,0.4)", flexShrink: 0 }}>→</span>
               </div>
             </Link>
+          </section>
+
+          {/* Dietary guides */}
+          <section style={{ marginBottom: 52 }}>
+            <h2 style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.06em", color: "#9C6B3C", margin: "0 0 16px", textTransform: "uppercase" }}>
+              Dietary
+            </h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {[
+                { href: "/guides/best-gluten-free-cinnamon-rolls-nyc", title: "Best Gluten-Free Cinnamon Rolls in NYC", description: "Bub's, Welcome Home, Breads Bakery, Baked — the spots that have actually solved gluten-free." },
+                { href: "/guides/best-vegan-cinnamon-rolls-nyc", title: "Best Vegan Cinnamon Rolls in NYC", description: "Bub's allergen-free bakery, Petee's Pie Co., and every fully vegan roll in the city." },
+              ].map((guide) => (
+                <Link key={guide.href} href={guide.href} style={{ textDecoration: "none" }}>
+                  <div style={{ background: "#fff", borderRadius: 10, border: "1px solid rgba(139,69,19,0.12)", padding: "18px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: 16, fontWeight: 700, color: "var(--cr-brown-dark)", marginBottom: 4 }}>{guide.title}</div>
+                      <div style={{ fontSize: 13, color: "#7A4010", lineHeight: 1.5 }}>{guide.description}</div>
+                    </div>
+                    <span style={{ fontSize: 16, color: "rgba(139,69,19,0.4)", flexShrink: 0 }}>→</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </section>
 
           {/* CTA */}

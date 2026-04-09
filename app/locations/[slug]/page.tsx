@@ -79,7 +79,7 @@ function buildJsonLd(loc: Location, slug: string) {
 }
 
 export const dynamicParams = false;
-export const revalidate = 0;
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const locations = await getLocations();
