@@ -26,7 +26,10 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const { slug } = await params;
   const loc = await getLocation(slug);
 
-  const name = loc?.display_name ?? loc?.name ?? "cinnamonrolls.nyc";
+  const rawName = loc?.display_name ?? loc?.name ?? "cinnamonrolls.nyc";
+  const name = loc?.neighborhood
+    ? rawName.replace(new RegExp(`\\s*[-–]\\s*${loc.neighborhood}`, "i"), "").trim()
+    : rawName;
   const sub = [loc?.neighborhood, loc?.borough].filter(Boolean).join(", ");
 
   return new ImageResponse(
@@ -44,7 +47,11 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         }}
       >
         {/* Top brown bar */}
-        <div style={{ width: "100%", height: 12, background: "#8B4513", display: "flex", flexShrink: 0 }} />
+        <div style={{ width: "100%", height: 24, background: "#8B4513", display: "flex", flexShrink: 0 }} />
+
+        {/* Left + right bars */}
+        <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, width: 24, background: "#8B4513", display: "flex" }} />
+        <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, width: 24, background: "#8B4513", display: "flex" }} />
 
         {/* Main content */}
         <div
@@ -71,10 +78,15 @@ export default async function Image({ params }: { params: Promise<{ slug: string
               width={44}
               height={44}
               alt=""
-              style={{ borderRadius: "50%", background: "#fff" }}
+              style={{ borderRadius: "50%" }}
             />
-            <div style={{ fontSize: 22, color: "#9C6B3C", fontWeight: 600, display: "flex" }}>
-              cinnamonrolls.nyc
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <div style={{ fontSize: 22, color: "#9C6B3C", fontWeight: 600, display: "flex" }}>
+                cinnamonrolls.nyc
+              </div>
+              <div style={{ fontSize: 16, color: "#9C6B3C", fontWeight: 400, display: "flex" }}>
+                the ultimate map of the city&apos;s best swirls
+              </div>
             </div>
           </div>
 
@@ -102,7 +114,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         </div>
 
         {/* Bottom brown bar */}
-        <div style={{ width: "100%", height: 12, background: "#8B4513", display: "flex", flexShrink: 0 }} />
+        <div style={{ width: "100%", height: 24, background: "#8B4513", display: "flex", flexShrink: 0 }} />
       </div>
     ),
     { ...size },
