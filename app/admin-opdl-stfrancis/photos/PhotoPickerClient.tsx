@@ -320,30 +320,35 @@ export default function PhotoPickerClient({ locations }: { locations: LocationWi
                     <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#9C6B3C", marginBottom: 8 }}>
                       Crop position
                     </div>
-                    <div style={{ fontSize: 11, color: "var(--cr-brown-mid)", marginBottom: 8 }}>
-                      Click anywhere on the image to set the crop focus — this matches the exact card ratio on the site.
+                    <div style={{ fontSize: 11, color: "var(--cr-brown-mid)", marginBottom: 10 }}>
+                      Click anywhere to set the focal point. Previews match the exact crop on the site.
                     </div>
-                    {/* Full-width card-ratio picker */}
-                    <div
-                      style={{ position: "relative", cursor: "crosshair", borderRadius: 6, overflow: "hidden", border: "1px solid rgba(139,69,19,0.15)", width: "100%" }}
-                      onClick={(e) => {
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
-                        const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
-                        setPendingCrop((p) => ({ ...p, [loc.id]: `${x}% ${y}%` }));
-                      }}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={state.photo_url} alt="" style={{ width: "100%", height: 160, objectFit: "cover", display: "block", objectPosition: currentPos }} />
-                      {/* Focal point dot */}
-                      {(() => {
-                        const parts = currentPos.split(" ");
-                        const px = parseFloat(parts[0]) || 50;
-                        const py = parseFloat(parts[1]) || 50;
-                        return (
-                          <div style={{ position: "absolute", left: `${px}%`, top: `${py}%`, transform: "translate(-50%, -50%)", width: 18, height: 18, borderRadius: "50%", background: "rgba(255,255,255,0.9)", border: "2.5px solid #8B4513", boxShadow: "0 1px 4px rgba(0,0,0,0.5)", pointerEvents: "none" }} />
-                        );
-                      })()}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {[{ label: "Guide card", height: 160 }, { label: "Bakery page", height: 220 }].map(({ label, height }) => (
+                        <div key={label}>
+                          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#9C6B3C", marginBottom: 4 }}>{label}</div>
+                          <div
+                            style={{ position: "relative", cursor: "crosshair", borderRadius: 6, overflow: "hidden", border: "1px solid rgba(139,69,19,0.15)", width: "100%" }}
+                            onClick={(e) => {
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+                              const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+                              setPendingCrop((p) => ({ ...p, [loc.id]: `${x}% ${y}%` }));
+                            }}
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={state.photo_url!} alt="" style={{ width: "100%", height, objectFit: "cover", display: "block", objectPosition: currentPos }} />
+                            {(() => {
+                              const parts = currentPos.split(" ");
+                              const px = parseFloat(parts[0]) || 50;
+                              const py = parseFloat(parts[1]) || 50;
+                              return (
+                                <div style={{ position: "absolute", left: `${px}%`, top: `${py}%`, transform: "translate(-50%, -50%)", width: 18, height: 18, borderRadius: "50%", background: "rgba(255,255,255,0.9)", border: "2.5px solid #8B4513", boxShadow: "0 1px 4px rgba(0,0,0,0.5)", pointerEvents: "none" }} />
+                              );
+                            })()}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                     {/* Controls row */}
                     <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
